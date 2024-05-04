@@ -1,1 +1,3 @@
 venv*
+ihms/db.sqlite3
+ihms/ihms/__pycache__/
