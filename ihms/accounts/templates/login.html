@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
+</head>
+<body>
+    <div id="main-container">
+        <div class="project-title">Integrated Management Healthcare System</div>
+        <form id="loginForm" method="post" action="{% url 'accounts:login' %}">
+            {% csrf_token %}
+            <h1>Login</h1>
+            {{ user_form.as_p }}
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</body>
+</html>

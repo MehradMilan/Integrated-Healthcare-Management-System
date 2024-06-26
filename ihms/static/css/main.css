@@ -1,0 +1,92 @@
+/* main.css - Enhanced Styling for Integrated Management Healthcare System signup page */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to right, #aba9a9 50%, #a1c1f7 50%); /* Dual background color */
+}
+
+form {
+    background: white;
+    width: 100%;
+    max-width: 450px;
+    margin: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow-y: auto; /* Adds scroller to the form if needed */
+    max-height: 80vh; /* Limit the form height to encourage scrolling */
+}
+
+h1 {
+    font-size: 26px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: 600;
+    color: #555;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Ensures padding is included in width/height */
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4a86e8;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #2770ba;
+}
+
+.note, .requirement {
+    font-size: 0.8rem; /* Smaller text */
+    color: #666; /* Lighter text color */
+    margin-bottom: 10px;
+}
+
+.required-star {
+    color: red; /* Make the star red */
+    font-size: 0.9rem; /* Slightly larger star for visibility */
+}
+
+/* Specific classes for formatting */
+.form-section {
+    margin-bottom: 20px;
+}
+
+.project-title {
+    font-size: 28px;  /* Increased from a default size to make it more prominent */
+    color: #333;      /* Optional: Sets a specific text color if needed */
+    text-align: center;
+    margin-bottom: 20px;  /* Adds space below the title */
+}
+
+.form-scrollable {
+    max-height: 300px; /* Set a maximum height */
+    overflow-y: auto; /* Enable vertical scrolling */
+    border: 1px solid #ccc; /* Optional: adds a border around the scrollable area */
+    padding: 10px; /* Padding inside the scrollable area */
+    margin-top: 10px; /* Space above the scrollable area */
+}

@@ -1,0 +1,65 @@
+{% load static %}
+<html>
+<head>
+    <title>Signup</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
+</head>
+<body>
+    <div id="main-container">
+        <div class="project-title">Integrated Management Healthcare System</div>
+        <form id="signupForm" method="post" action="{% url 'accounts:signup' %}">
+            {% csrf_token %}
+            <h1>Sign Up</h1>
+            <div class="form-section">
+                {{ user_form.as_p }}
+                <div class="note"><span class="required-star">*</span> Username and password fields are required.</div>
+            </div>
+            <div class="form-section">
+                <label for="role">Role:</label>
+                <select name="role" id="roleSelector" onchange="toggleRoleFields();">
+                    <option value="">Select Role</option>
+                    <option value="patient">Patient</option>
+                    <option value="doctor">Doctor</option>
+                </select>
+            </div>
+            <div id="patientFields" class="form-section form-scrollable" style="display:none;">
+                {{ patient_form.as_p }}
+            </div>
+            <div id="doctorFields" class="form-section form-scrollable" style="display:none;">
+                {{ doctor_form.as_p }}
+            </div>            
+            <button type="submit">Sign Up</button>
+        </form>
+    </div>
+
+    <script>
+        function toggleRoleFields() {
+            var selector = document.getElementById('roleSelector');
+            var role = selector.value;
+            var patientFields = document.getElementById('patientFields');
+            var doctorFields = document.getElementById('doctorFields');
+
+            patientFields.style.display = 'none';
+            doctorFields.style.display = 'none';
+
+            if (role === 'patient') {
+                patientFields.style.display = 'block';
+                slideDown(patientFields); // Animated slide down
+                patientFields.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
+                doctorFields.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+            } else if (role === 'doctor') {
+                doctorFields.style.display = 'block';
+                slideDown(doctorFields); // Animated slide down
+                doctorFields.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
+                patientFields.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+            }
+        }
+
+        function slideDown(element) {
+            element.style.maxHeight = '0';
+            element.style.transition = 'max-height 0.5s ease-in';
+            element.style.maxHeight = '300px'; // Same as the max height in CSS
+        }
+    </script>
+</body>
+</html>
