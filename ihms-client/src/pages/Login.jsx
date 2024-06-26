@@ -47,16 +47,20 @@ function Login() {
         }),
         {
           pending: "در حال ورود...",
-          success: "ورود با موفقیت انجام شد",
-          error: "خطا در ورود",
+          success: ".ورود با موفقیت انجام شد",
+          error: "خطا در ورود (اگر از صحت اطلاعات اطمینان دارید، ممکن است حساب شما تایید نشده باشد.)",
         }
       );
 
-      const isActivated = response.data.activated;
+      const is_doctor = response.data.is_doctor;
+      const is_guardian = response.data.is_guardian;
         
-      if (isActivated) {
+      if (response.status === 200 && is_doctor) {
         toast.success("ثبت‌نام موفقیت‌آمیز بود و حساب کاربری شما فعال شده است.");
-        navigate("/dashboard");
+        navigate("/doctor-dashboard");
+      } else if (response.status === 200 && is_guardian) {
+        toast.success("ثبت‌نام موفقیت‌آمیز بود و حساب کاربری شما فعال شده است.");
+        navigate("/guardian-dashboard");
       } else {
         toast.info("حساب کاربری شما هنوز فعال‌سازی نشده‌است. می‌توانید با مدیریت ما در ارتباط باشید.");
       }
