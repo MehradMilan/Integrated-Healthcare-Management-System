@@ -51,15 +51,17 @@ GENDER_CHOICES = [
 
 
 class IHMSUser(AbstractUser):
+    username = models.CharField(
+        _("username"),
+        max_length=150,
+    )
+
     national_id = models.CharField(max_length=10, validators=[validate_iranian_national_id], unique=True)
     birthdate = models.DateField()
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
 
     USERNAME_FIELD = 'national_id'
     REQUIRED_FIELDS = []  # No additional fields required at creation time besides the password
-
-    def __str__(self):
-        return self.username
 
 
 class City(Enum):
@@ -87,7 +89,7 @@ class Guardian(models.Model):
     user = models.OneToOneField(IHMSUser, on_delete=models.CASCADE, primary_key=True)
     city = models.CharField(max_length=50, choices=[(tag.value, tag.value) for tag in City])
     charity_org_name = models.CharField(max_length=100)
-    national_id_card_image = models.ImageField(upload_to='guardians_national_id/')
+    national_id_card_image = models.URLField()
 
 
 class Doctor(models.Model):
@@ -104,4 +106,4 @@ class Doctor(models.Model):
     specialty = models.CharField(max_length=2, choices=SPECIALTY)
     city = models.CharField(max_length=50, choices=[(tag.value, tag.value) for tag in City])
     medical_system_code = models.CharField(max_length=10, unique=True)
-    practice_licence_image = models.ImageField(upload_to="practice_licence/")
+    practice_licence_image = models.URLField()
