@@ -1,8 +1,9 @@
-from django.db import models
-from django.contrib.auth.models import AbstractUser
+import re
 from enum import Enum
-from datetime import date
+
+from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
@@ -23,6 +24,26 @@ def validate_iranian_national_id(value):
         raise ValidationError(_('Invalid National ID checksum.'), code='invalid_checksum')
 
 
+def validate_iranian_phone(value):
+    pattern = re.compile(r'^(?:0|\+?98)9\d{9}$')
+
+    if not pattern.match(value):
+        raise ValidationError(
+            _('Invalid Iranian phone number. Please enter a valid phone number with or without the country code.'),
+            params={'value': value},
+        )
+
+
+def validate_iranian_landline(value):
+    pattern = re.compile(r'^0(21|26|25|31|41|44|51|61|66|71|74|77|81|86|87|111|115|123|132|142|144|152|162|172|182|192)\d{7,8}$')
+
+    if not pattern.match(value):
+        raise ValidationError(
+            _('Invalid Iranian landline phone number. Please enter a valid phone number including the area code.'),
+            params={'value': value},
+        )
+
+
 GENDER_CHOICES = [
     ('M', 'MALE'),
     ('F', 'FEMALE'),
@@ -38,7 +59,7 @@ class IHMSUser(AbstractUser):
     REQUIRED_FIELDS = []  # No additional fields required at creation time besides the password
 
     def __str__(self):
-            return self.username
+        return self.username
 
 
 class City(Enum):
@@ -75,10 +96,11 @@ class Doctor(models.Model):
     ]
 
     user = models.OneToOneField(IHMSUser, on_delete=models.CASCADE, primary_key=True)
-    phone_number = models.CharField(max_length=15, unique=True, blank=True, null=True)
-    address = models.CharField(max_length=255)
-    latitude = models.DecimalField(max_digits=9, decimal_places=6)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6)
+    landline = models.CharField(max_length=15, validators=[validate_iranian_landline], blank=True, null=True)
+    phone_number = models.CharField(max_length=15, validators=[validate_iranian_phone], blank=True, null=True)
+    address = models.CharField(max_length=255, null=True, blank=True)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
     specialty = models.CharField(max_length=2, choices=SPECIALTY)
     city = models.CharField(max_length=50, choices=[(tag.value, tag.value) for tag in City])
     medical_system_code = models.CharField(max_length=10, unique=True)

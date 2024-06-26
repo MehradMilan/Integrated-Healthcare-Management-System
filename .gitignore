@@ -41,3 +41,5 @@ django-queries-results.html
 
 saleor/settings/local.py
 celerybeat-schedule*
+
+media/
