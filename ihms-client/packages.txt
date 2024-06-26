@@ -2,3 +2,4 @@ react-router-dom
 react-hot-toast
 jwt-decode
 axios
+react-google-recaptcha

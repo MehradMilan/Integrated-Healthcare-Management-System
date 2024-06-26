@@ -1,5 +1,3 @@
-/* register.css */
-
 body {
   font-family: 'Vazir', sans-serif;
   background-color: #f7f9fc;
@@ -28,7 +26,7 @@ body {
   font-weight: bold;
 }
 
-.register-section {
+.login-section {
   flex: 1;
   display: flex;
   justify-content: center;
@@ -37,7 +35,7 @@ body {
   background-color: #f0f0f0;
 }
 
-.register-container {
+.login-container {
   background-color: #ffffff;
   padding: 30px;
   border-radius: 8px;
@@ -56,7 +54,7 @@ body {
   font-weight: bold;
 }
 
-.register-form {
+.login-form {
   display: flex;
   flex-direction: column;
 }
@@ -79,8 +77,8 @@ body {
   color: #666666;
 }
 
-.form-input, .form-choice {
-  width: 75%;
+.form-input {
+  width: 100%;
   padding: 12px;
   border: 1px solid #dddddd;
   border-radius: 4px;
@@ -88,7 +86,7 @@ body {
   transition: border-color 0.3s;
 }
 
-.form-input:focus, .form-choice:focus {
+.form-input:focus {
   border-color: #007bff;
   outline: none;
 }
@@ -119,37 +117,31 @@ body {
   background-color: #0056b3;
 }
 
-.separator {
-  border: 0;
-  height: 1px;
-  margin: 10px 0;
-  background: #e0e0e0;
-  width: 100%;
-}
-
 .flex-center {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.login-prompt {
+.login-options {
   margin-top: 20px;
   text-align: center;
   color: #666666;
 }
 
-.login-link {
+.forgot-password-link,
+.signup-link {
   color: #007bff;
   text-decoration: none;
   font-size: 1rem;
+  display: inline-block;
+  margin: 10px 0;
+  transition: color 0.3s;
 }
 
-.note {
-  text-align: center;
-  margin-top: 10px;
-  font-size: 0.9rem;
-  color: #666666;
+.forgot-password-link:hover,
+.signup-link:hover {
+  color: #0056b3;
 }
 
 .footer {
@@ -160,29 +152,4 @@ body {
   color: #666666;
   border-top: 1px solid #e0e0e0;
   width: 100%;
-}
-
-.uploaded-image {
-  margin-top: 10px;
-  position: relative;
-  display: inline-block;
-}
-
-.uploaded-image img.thumbnail {
-  max-width: 100px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-}
-
-.uploaded-image .remove-image-btn {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background: red;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  padding: 2px 6px;
-  font-size: 14px;
 }

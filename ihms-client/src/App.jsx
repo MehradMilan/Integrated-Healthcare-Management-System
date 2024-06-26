@@ -15,7 +15,7 @@
 
 // import "./styles/app.css";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-// import Login from "./pages/Login";
+import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { Toaster } from "react-hot-toast";
 import { Protected, Public, Admin } from "./middleware/route";
@@ -37,10 +37,14 @@ function App() {
       <Toaster />
       <Suspense fallback={<Loading />}>
         <Routes>
-          {/* <Route
+          {<Route
             path="/login"
-            element={<Login />}
-          /> */}
+            element={
+              <Public>
+                <Login />
+              </Public>
+            }
+          />}
           <Route
             path="/register"
             element={

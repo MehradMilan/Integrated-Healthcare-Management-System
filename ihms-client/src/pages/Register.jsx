@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/register.css";
 import axios from "axios";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 
-axios.defaults.baseURL = import.meta.env.REACT_APP_SERVER_DOMAIN;
+axios.defaults.baseURL = import.meta.env.VITE_SERVER_DOMAIN;
 
 function Register() {
   const [userType, setUserType] = useState("doctor");
@@ -35,20 +35,36 @@ function Register() {
     if (element.type === "image/jpeg" || element.type === "image/png") {
       const data = new FormData();
       data.append("file", element);
-      data.append("upload_preset", import.meta.env.REACT_APP_CLOUDINARY_PRESET);
-      data.append("cloud_name", import.meta.env.REACT_APP_CLOUDINARY_CLOUD_NAME);
-      fetch(import.meta.env.REACT_APP_CLOUDINARY_BASE_URL, {
+      data.append("upload_preset", import.meta.env.VITE_CLOUDINARY_PRESET);
+      data.append("cloud_name", import.meta.env.VITE_CLOUDINARY_CLOUD_NAME);
+      data.append("api_key", import.meta.env.VITE_CLOUDINARY_API_KEY);
+
+      fetch(import.meta.env.VITE_CLOUDINARY_BASE_URL, {
         method: "POST",
         body: data,
       })
         .then((res) => res.json())
-        .then((data) => setFile(data.url.toString()))
-        .catch((error) => toast.error("خطا در بارگذاری تصویر"))
+        .then((data) => {
+          if (data.error) {
+            throw new Error(data.error.message);
+          }
+          setFile(data.secure_url);
+          toast.success("تصویر با موفقیت بارگذاری شد");
+        })
+        .catch((error) => {
+          console.error("Error uploading image:", error);
+          toast.error("خطا در بارگذاری تصویر");
+        })
         .finally(() => setLoading(false));
     } else {
       setLoading(false);
       toast.error("لطفا یک تصویر با فرمت jpeg یا png انتخاب کنید");
     }
+  };
+
+  const removeImage = () => {
+    setFile("");
+    toast("تصویر حذف شد", { icon: '❌' });
   };
 
   const formSubmit = async (e) => {
@@ -90,6 +106,7 @@ function Register() {
 
   return (
     <div className="container">
+      <Toaster />
       <h1 className="main-title">طرح پزشکان شریف</h1>
       <section className="register-section flex-center">
         <div className="register-container">
@@ -184,58 +201,22 @@ function Register() {
                 />
               </div>
             </div>
-            {userType === "doctor" && (
-              <div className="form-row">
-                <div className="form-group">
-                  <label>تخصص <span className="required">*</span></label>
-                  <select
-                    name="specialization"
-                    value={formDetails.specialization}
-                    onChange={inputChange}
-                    className="form-choice"
-                  >
-                    <option value="عمومی">عمومی</option>
-                    <option value="دندان‌پزشک">دندان‌پزشک</option>
-                    <option value="جراح دندان">جراح دندان</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>تصویر پروانه پزشکی <span className="required">*</span></label>
-                  <input
-                    type="file"
-                    onChange={(e) => onUpload(e.target.files[0])}
-                    name="medicalCertificate"
-                    id="medicalCertificate"
-                    className="form-input"
-                  />
-                </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>تصویر پروانه پزشکی یا کارت ملی <span className="required">*</span></label>
+                <input
+                  type="file"
+                  onChange={(e) => onUpload(e.target.files[0])}
+                  className="form-input"
+                />
+                {file && (
+                  <div className="uploaded-image">
+                    <img src={file} alt="Uploaded" className="thumbnail" />
+                    <button type="button" className="remove-image-btn" onClick={removeImage}>×</button>
+                  </div>
+                )}
               </div>
-            )}
-            {userType === "supervisor" && (
-              <div className="form-row">
-                <div className="form-group">
-                  <label>تصویر کارت ملی <span className="required">*</span></label>
-                  <input
-                    type="file"
-                    onChange={(e) => onUpload(e.target.files[0])}
-                    name="nationalCard"
-                    id="nationalCard"
-                    className="form-input"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>نام موسسه خیریه <span className="required">*</span></label>
-                  <input
-                    type="text"
-                    name="charityName"
-                    className="form-input"
-                    placeholder="نام موسسه خیریه"
-                    value={formDetails.charityName}
-                    onChange={inputChange}
-                  />
-                </div>
-              </div>
-            )}
+            </div>
             <div className="form-row">
               <div className="form-group">
                 <button
