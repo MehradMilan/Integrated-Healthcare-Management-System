@@ -51,6 +51,7 @@ body {
 .form-heading {
   font-size: 1.8rem;
   margin-bottom: 20px;
+  margin-top: -10px;
   color: #333333;
   text-align: center;
   font-weight: bold;
@@ -70,6 +71,7 @@ body {
 .form-group {
   flex: 1;
   margin-bottom: 20px;
+  width: 50%;
 }
 
 .form-group label {
@@ -165,7 +167,7 @@ body {
 .uploaded-image {
   margin-top: 10px;
   position: relative;
-  display: inline-block;
+  display: table-caption;
 }
 
 .uploaded-image img.thumbnail {
