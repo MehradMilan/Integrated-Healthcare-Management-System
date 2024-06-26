@@ -19,7 +19,7 @@ function Register() {
     medicalCode: "",
     nationalCode: "",
     specialization: "عمومی",
-    city: "",
+    city: "تهران",
     charityName: "",
     phoneNumber: "",
     password: "",
@@ -82,12 +82,14 @@ function Register() {
       return;
     }
 
-    const { firstname, lastname, medicalCode, nationalCode, city, charityName, password, birthdate, gender, specialty } = formDetails;
+    const { firstname, lastname, medicalCode, nationalCode, city, charityName, phoneNumber, password, birthdate, gender, specialty } = formDetails;
     if (userType === "doctor" && (!firstname || !lastname || !medicalCode || !nationalCode || !city || !password || !birthdate || !gender || !specialty)) {
+      console.log(formDetails)
       toast.error("لطفا همه فیلدهای الزامی را پر کنید");
       return;
     }
-    if (userType === "supervisor" && (!firstname || !lastname || !nationalCode || !city || !charityName || !password || !birthdate || !gender)) {
+    if (userType === "guardian" && (!firstname || !lastname || !nationalCode || !city || !charityName || !password || !birthdate || !gender)) {
+      console.log(formDetails)
       toast.error("لطفا همه فیلدهای الزامی را پر کنید");
       return;
     }
@@ -100,25 +102,37 @@ function Register() {
         birthdate: convertedBirthdate,
         password,
         gender: gender === "آقا" ? "M" : "F",
+        first_name: firstname,
+        last_name: lastname,
       },
-      specialty: userType === "doctor" ? specialty : "",
       city,
-      medical_system_code: userType === "doctor" ? medicalCode : "",
-      practice_licence_image: file,
     };
+
+    if (userType === "guardian") {
+      userData.charity_org_name = charityName;
+      userData.phone_number = phoneNumber;
+      userData.national_id_card_image = file;
+    }
+    if (userType === "doctor") {
+      userData.medical_system_code = medicalCode;
+      userData.specialty = specialty;
+      userData.practice_licence_image = file;
+    }
 
     try {
       console.log(userData);
+      var urlType = userType === "doctor" ? "/doctors/" : "/guardians/";
       await toast.promise(
-        axios.post("/doctors/", userData),
+        axios.post(urlType, userData),
         {
           pending: "در حال ایجاد حساب کاربری...",
-          success: "حساب کاربری با موفقیت ایجاد شد",
+          success: "حساب کاربری با موفقیت ایجاد شد و پس از بررسی کارشناسان ما، تایید یا رد خواهد شد.",
           error: "خطا در ایجاد حساب کاربری",
         }
       );
       navigate("/login");
     } catch (error) {
+      console.log(error)
       toast.error("خطایی رخ داده است");
     }
   };
@@ -141,7 +155,7 @@ function Register() {
                   className="form-choice"
                 >
                   <option value="doctor">دکتر</option>
-                  <option value="supervisor">سرپرست</option>
+                  <option value="guardian">سرپرست</option>
                 </select>
               </div>
             </div>
@@ -195,7 +209,7 @@ function Register() {
                   />
                 </div>
               )}
-              {userType === "supervisor" && (
+              {userType === "guardian" && (
                 <div className="form-group">
                 <label>شماره‌ی تلفن همراه<span className="required">*</span></label>
                 <input
@@ -290,6 +304,23 @@ function Register() {
                     <option value="دندانپزشکی زیبایی">دندانپزشکی زیبایی</option>
                   </select>
                 </div>
+                <div className="form-group"></div>
+              </div>
+            )}
+            {userType === "guardian" && (
+              <div className="form-row">
+                <div className="form-group">
+                  <label>نام موسسه‌ی خیریه<span className="required">*</span></label>
+                  <input
+                    type="text"
+                    name="charityName"
+                    className="form-input"
+                    placeholder="مثلا: خیریه‌ی محبان"
+                    value={formDetails.charityName}
+                    onChange={inputChange}
+                  />
+                </div>
+                <div className="form-group"></div>
               </div>
             )}
             {userType === "doctor" && (
@@ -310,7 +341,7 @@ function Register() {
               </div>
             </div>
             )}
-            {userType === "supervisor" && (
+            {userType === "guardian" && (
             <div className="form-row">
               <div className="form-group">
                 <label>تصویر کارت ملی <span className="required">*</span></label>
@@ -328,6 +359,7 @@ function Register() {
               </div>
             </div>
             )}
+            <hr className="separator" />
             <div className="form-row">
               <div className="form-group">
                 <button

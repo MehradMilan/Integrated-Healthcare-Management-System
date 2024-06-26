@@ -11,7 +11,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [captcha, setCaptcha] = useState(null);
   const [formDetails, setFormDetails] = useState({
-    nationalCode: "",
+    national_id: "",
     password: ""
   });
   const navigate = useNavigate();
@@ -31,23 +31,19 @@ function Login() {
   const formSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
-    if (!captcha) {
-      toast.error("لطفا کپچا را تایید کنید");
-      return;
-    }
 
-    const { nationalCode, password } = formDetails;
-    if (!nationalCode || !password) {
+    const { national_id, password } = formDetails;
+    if (!national_id || !password) {
       toast.error("لطفا همه فیلدهای الزامی را پر کنید");
       return;
     }
 
     try {
-      await toast.promise(
-        axios.post("/user/login", {
-          nationalCode,
+      const response = await toast.promise(
+        axios.post("/login/", {
+          national_id,
           password,
-          captcha
+          // captcha
         }),
         {
           pending: "در حال ورود...",
@@ -55,7 +51,15 @@ function Login() {
           error: "خطا در ورود",
         }
       );
-      navigate("/dashboard");
+
+      const isActivated = response.data.activated;
+        
+      if (isActivated) {
+        toast.success("ثبت‌نام موفقیت‌آمیز بود و حساب کاربری شما فعال شده است.");
+        navigate("/dashboard");
+      } else {
+        toast.info("حساب کاربری شما هنوز فعال‌سازی نشده‌است. می‌توانید با مدیریت ما در ارتباط باشید.");
+      }
     } catch (error) {
       toast.error("خطایی رخ داده است");
     }
@@ -73,10 +77,10 @@ function Login() {
                 <label>کد ملی <span className="required">*</span></label>
                 <input
                   type="text"
-                  name="nationalCode"
+                  name="national_id"
                   className="form-input"
                   placeholder="کد ملی"
-                  value={formDetails.nationalCode}
+                  value={formDetails.national_id}
                   onChange={inputChange}
                 />
               </div>
