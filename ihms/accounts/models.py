@@ -35,7 +35,8 @@ def validate_iranian_phone(value):
 
 
 def validate_iranian_landline(value):
-    pattern = re.compile(r'^0(21|26|25|31|41|44|51|61|66|71|74|77|81|86|87|111|115|123|132|142|144|152|162|172|182|192)\d{7,8}$')
+    pattern = re.compile(
+        r'^0(21|26|25|31|41|44|51|61|66|71|74|77|81|86|87|111|115|123|132|142|144|152|162|172|182|192)\d{7,8}$')
 
     if not pattern.match(value):
         raise ValidationError(
@@ -64,14 +65,6 @@ class IHMSUser(AbstractUser):
     REQUIRED_FIELDS = []  # No additional fields required at creation time besides the password
 
 
-class City(Enum):
-    TEHRAN = 'THR'
-    SHIRAZ = 'SHZ'
-    URMIA = 'URM'
-    TABRIZ = 'TBZ'
-    KARAJ = 'KRJ'
-
-
 class Patient(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
@@ -82,19 +75,28 @@ class Patient(models.Model):
     address = models.CharField(max_length=255)
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
-    city = models.CharField(max_length=50, choices=[(tag.value, tag.value) for tag in City])
+    city = models.CharField(max_length=50)
 
 
 class Guardian(models.Model):
     user = models.OneToOneField(IHMSUser, on_delete=models.CASCADE, primary_key=True)
-    city = models.CharField(max_length=50, choices=[(tag.value, tag.value) for tag in City])
+    city = models.CharField(max_length=50)
     charity_org_name = models.CharField(max_length=100)
     national_id_card_image = models.URLField()
 
 
 class Doctor(models.Model):
     SPECIALTY = [
-        ('DE', 'Dentist'),
+        ("ارتودنسی", "ارتودنسی"),
+        ("پریودنتولوژی", "پریودنتولوژی"),
+        ("دندانپزشکی کودکان", "دندانپزشکی کودکان"),
+        ("اندودنتیکس", "اندودنتیکس"),
+        ("پروتزهای دندانی", "پروتزهای دندانی"),
+        ("جراحی دهان، فک و صورت", "جراحی دهان، فک و صورت"),
+        ("پروتزهای دندانی ثابت و متحرک", "پروتزهای دندانی ثابت و متحرک"),
+        ("رادیولوژی دهان و دندان", "رادیولوژی دهان و دندان"),
+        ("دندانپزشکی ترمیمی", "دندانپزشکی ترمیمی"),
+        ("دندانپزشکی زیبایی", "دندانپزشکی زیبایی")
     ]
 
     user = models.OneToOneField(IHMSUser, on_delete=models.CASCADE, primary_key=True)
@@ -103,7 +105,7 @@ class Doctor(models.Model):
     address = models.CharField(max_length=255, null=True, blank=True)
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
-    specialty = models.CharField(max_length=2, choices=SPECIALTY)
-    city = models.CharField(max_length=50, choices=[(tag.value, tag.value) for tag in City])
+    specialty = models.CharField(max_length=30, choices=SPECIALTY)
+    city = models.CharField(max_length=50)
     medical_system_code = models.CharField(max_length=10, unique=True)
     practice_licence_image = models.URLField()
