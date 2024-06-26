@@ -1,7 +1,8 @@
 import re
 from enum import Enum
 
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -51,7 +52,28 @@ GENDER_CHOICES = [
 ]
 
 
-class IHMSUser(AbstractUser):
+class IHMSUserManager(BaseUserManager):
+    def create_user(self, national_id, password=None, **extra_fields):
+        if not national_id:
+            raise ValueError('The National ID must be set')
+        user = self.model(national_id=national_id, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, national_id, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self.create_user(national_id, password, **extra_fields)
+
+
+class IHMSUser(AbstractUser, PermissionsMixin):
     username = models.CharField(
         _("username"),
         max_length=150,
@@ -60,6 +82,8 @@ class IHMSUser(AbstractUser):
     national_id = models.CharField(max_length=10, validators=[validate_iranian_national_id], unique=True)
     birthdate = models.DateField()
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+
+    objects = IHMSUserManager()
 
     USERNAME_FIELD = 'national_id'
     REQUIRED_FIELDS = []

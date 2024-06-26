@@ -11,6 +11,15 @@ class IHMSUserSerializer(serializers.ModelSerializer):
         instance = super().create(validated_data)
         instance.set_password(validated_data['password'])
         instance.save()
+        print(f"{instance.password=}")
+        return instance
+
+    def update(self, instance, validated_data):
+        super().update(instance, validated_data)
+        password = validated_data.get('password', None)
+        if password:
+            instance.set_password(password)
+        instance.save()
         return instance
 
 
@@ -23,8 +32,9 @@ class DoctorSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
-        print(f"{user_data=}")
-        user = IHMSUser.objects.create(**user_data)
+        user = IHMSUser.objects.create_user(**user_data)
+        user.save()
+        print(f"my {user.password=}")
         doctor = Doctor.objects.create(user=user, **validated_data)
         return doctor
 
@@ -53,7 +63,7 @@ class GuardianSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
-        user = IHMSUser.objects.create(**user_data)
+        user = IHMSUser.objects.create_user(**user_data)
         print(f"{user_data=}")
         guardian = Guardian.objects.create(user=user, **validated_data)
         return guardian
