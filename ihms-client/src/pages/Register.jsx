@@ -21,6 +21,7 @@ function Register() {
     specialization: "عمومی",
     city: "",
     charityName: "",
+    phoneNumber: "",
     password: "",
     birthdate: "",
     gender: "آقا",
@@ -91,7 +92,6 @@ function Register() {
       return;
     }
 
-    // Convert birthdate from Shamsi to Gregorian
     const convertedBirthdate = new Date(birthdate).toISOString().split("T")[0];
 
     const userData = {
@@ -112,9 +112,9 @@ function Register() {
       await toast.promise(
         axios.post("/doctors/", userData),
         {
-          pending: "در حال ثبت نام...",
-          success: "کاربر با موفقیت ثبت نام شد",
-          error: "خطا در ثبت نام کاربر",
+          pending: "در حال ایجاد حساب کاربری...",
+          success: "حساب کاربری با موفقیت ایجاد شد",
+          error: "خطا در ایجاد حساب کاربری",
         }
       );
       navigate("/login");
@@ -194,6 +194,19 @@ function Register() {
                     onChange={inputChange}
                   />
                 </div>
+              )}
+              {userType === "supervisor" && (
+                <div className="form-group">
+                <label>شماره‌ی تلفن همراه<span className="required">*</span></label>
+                <input
+                  type="text"
+                  name="phoneNumber"
+                  className="form-input"
+                  placeholder="مثلا: 09123456789"
+                  value={formDetails.phoneNumber}
+                  onChange={inputChange}
+                />
+              </div>
               )}
             </div>
             <div className="form-row">
@@ -279,9 +292,10 @@ function Register() {
                 </div>
               </div>
             )}
+            {userType === "doctor" && (
             <div className="form-row">
               <div className="form-group">
-                <label>تصویر پروانه پزشکی یا کارت ملی <span className="required">*</span></label>
+                <label>تصویر پروانه پزشکی <span className="required">*</span></label>
                 <input
                   type="file"
                   onChange={(e) => onUpload(e.target.files[0])}
@@ -295,6 +309,25 @@ function Register() {
                 )}
               </div>
             </div>
+            )}
+            {userType === "supervisor" && (
+            <div className="form-row">
+              <div className="form-group">
+                <label>تصویر کارت ملی <span className="required">*</span></label>
+                <input
+                  type="file"
+                  onChange={(e) => onUpload(e.target.files[0])}
+                  className="form-input"
+                />
+                {file && (
+                  <div className="uploaded-image">
+                    <img src={file} alt="Uploaded" className="thumbnail" />
+                    <button type="button" className="remove-image-btn" onClick={removeImage}>×</button>
+                  </div>
+                )}
+              </div>
+            </div>
+            )}
             <div className="form-row">
               <div className="form-group">
                 <button
