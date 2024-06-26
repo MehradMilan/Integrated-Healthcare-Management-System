@@ -3,4 +3,5 @@ react-hot-toast
 jwt-decode
 axios
 react-google-recaptcha
-npm install react-multi-date-picker
+react-multi-date-picker
+google-map-react

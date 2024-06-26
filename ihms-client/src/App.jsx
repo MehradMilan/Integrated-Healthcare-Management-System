@@ -1,19 +1,3 @@
-// import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
-// import './App.css'
-
-// function App() {
-//   const [count, setCount] = useState(0)
-
-//   return (
-    
-//   )
-// }
-
-// export default App
-
-// import "./styles/app.css";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -21,9 +5,10 @@ import { Toaster } from "react-hot-toast";
 import { Protected, Public, Admin } from "./middleware/route";
 import React, { lazy, Suspense } from "react";
 import Loading from "./components/Loading";
+import { CookiesProvider, useCookies } from 'react-cookie'
 
 // const Home = lazy(() => import("./pages/Home"));
-// const Dashboard = lazy(() => import("./pages/Dashboard"));
+const GuardianDashboard = lazy(() => import("./pages/Guardian-Dashboard"));
 // const Appointments = lazy(() => import("./pages/Appointments"));
 // const Doctors = lazy(() => import("./pages/Doctors"));
 // const Profile = lazy(() => import("./pages/Profile"));
@@ -32,6 +17,7 @@ import Loading from "./components/Loading";
 const Error = lazy(() => import("./pages/Error"));
 
 function App() {
+
   return (
     <Router>
       <Toaster />
@@ -50,6 +36,14 @@ function App() {
             element={
               <Public>
                 <Register />
+              </Public>
+            }
+          />
+          <Route
+            path="/guardian-dashboard"
+            element={
+              <Public>
+                <GuardianDashboard />
               </Public>
             }
           />
