@@ -64,6 +64,14 @@ class IHMSUser(AbstractUser):
     USERNAME_FIELD = 'national_id'
     REQUIRED_FIELDS = []
 
+    def role(self):
+        if bool(hasattr(self, "doctor")):
+            return "doctor"
+        elif bool(hasattr(self, "guardian")):
+            return "guardian"
+        else:
+            return "user"
+
 
 class Patient(models.Model):
     first_name = models.CharField(max_length=100)
@@ -81,8 +89,10 @@ class Patient(models.Model):
 class Guardian(models.Model):
     user = models.OneToOneField(IHMSUser, on_delete=models.CASCADE, primary_key=True)
     city = models.CharField(max_length=50)
+    phone_number = models.CharField(max_length=15, validators=[validate_iranian_phone], blank=True, null=True)
     charity_org_name = models.CharField(max_length=100)
     national_id_card_image = models.URLField()
+    is_active = models.BooleanField(default=False)
 
 
 class Doctor(models.Model):
@@ -109,3 +119,4 @@ class Doctor(models.Model):
     city = models.CharField(max_length=50)
     medical_system_code = models.CharField(max_length=10, unique=True)
     practice_licence_image = models.URLField()
+    is_active = models.BooleanField(default=False)

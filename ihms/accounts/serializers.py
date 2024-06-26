@@ -13,7 +13,7 @@ class DoctorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Doctor
-        fields = '__all__'
+        exclude = ['is_active']
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
