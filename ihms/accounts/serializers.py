@@ -5,7 +5,7 @@ from .models import Doctor, IHMSUser, Guardian
 class IHMSUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = IHMSUser
-        fields = ['national_id', 'birthdate', 'gender']
+        fields = ['national_id', 'birthdate', 'gender', 'password']
 
 
 class DoctorSerializer(serializers.ModelSerializer):
@@ -17,6 +17,7 @@ class DoctorSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
+        print(f"{user_data=}")
         user = IHMSUser.objects.create(**user_data)
         doctor = Doctor.objects.create(user=user, **validated_data)
         return doctor
@@ -47,6 +48,7 @@ class GuardianSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user_data = validated_data.pop('user')
         user = IHMSUser.objects.create(**user_data)
+        print(f"{user_data=}")
         guardian = Guardian.objects.create(user=user, **validated_data)
         return guardian
 
