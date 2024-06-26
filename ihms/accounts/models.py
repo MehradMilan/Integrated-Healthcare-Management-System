@@ -62,7 +62,7 @@ class IHMSUser(AbstractUser):
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
 
     USERNAME_FIELD = 'national_id'
-    REQUIRED_FIELDS = []  # No additional fields required at creation time besides the password
+    REQUIRED_FIELDS = []
 
 
 class Patient(models.Model):

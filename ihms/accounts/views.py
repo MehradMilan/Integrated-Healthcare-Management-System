@@ -1,13 +1,9 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login as auth_login
-from .forms import IHMSUserForm, PatientForm, DoctorForm
-
-# Create your views here.
-from django.shortcuts import render, redirect
-from .forms import IHMSUserForm, PatientForm, DoctorForm
+from django.contrib.auth import authenticate, login
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
 from .serializers import DoctorSerializer, GuardianSerializer
 
 
@@ -31,36 +27,16 @@ def create_guardian(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def signup(request):
-    if request.method == 'POST':
-        user_form = IHMSUserForm(request.POST)
-        patient_form = PatientForm(request.POST)
-        doctor_form = DoctorForm(request.POST)
-        if user_form.is_valid():
-            new_user = user_form.save(commit=False)
-            new_user.set_password(user_form.cleaned_data['password'])
-            new_user.save()
+@api_view(['POST'])
+def login_view(request):
+    national_id = request.data.get('national_id')
+    password = request.data.get('password')
+    if not national_id or not password:
+        return Response({'error': 'Please provide both national_id and password.'}, status=400)
 
-            role = request.POST.get('role', '')
-            if role == 'patient' and patient_form.is_valid():
-                patient_form.instance.user = new_user
-                patient_form.save()
-            elif role == 'doctor' and doctor_form.is_valid():
-                doctor_form.instance.user = new_user
-                doctor_form.save()
-
-            return redirect('login')
+    user = authenticate(request, username=national_id, password=password)
+    if user is not None:
+        login(request, user)
+        return Response({'message': 'Login successful.', 'is_doctor': bool(hasattr(user, "doctor")), 'is_guardian': bool(hasattr(user, "guardian"))}, status=200)
     else:
-        user_form = IHMSUserForm()
-        patient_form = PatientForm()
-        doctor_form = DoctorForm()
-
-    return render(request, 'signup.html', {
-        'user_form': user_form,
-        'patient_form': patient_form,
-        'doctor_form': doctor_form
-    })
-
-
-def login(request):
-    return render(request, 'login.html')
+        return Response({'error': 'Invalid credentials.'}, status=401)
