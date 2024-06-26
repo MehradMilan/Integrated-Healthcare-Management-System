@@ -36,7 +36,11 @@ def login_view(request):
 
     user = authenticate(request, username=national_id, password=password)
     if user is not None:
-        login(request, user)
-        return Response({'message': 'Login successful.', 'is_doctor': bool(hasattr(user, "doctor")), 'is_guardian': bool(hasattr(user, "guardian"))}, status=200)
+        if user.is_active:
+            login(request, user)
+            return Response({'message': 'Login successful.', 'is_doctor': bool(hasattr(user, "doctor")),
+                            'is_guardian': bool(hasattr(user, "guardian"))}, status=200)
+        else:
+            return Response({'error': 'User is inactive.'}, status=403)
     else:
         return Response({'error': 'Invalid credentials.'}, status=401)

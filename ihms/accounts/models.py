@@ -96,6 +96,13 @@ class IHMSUser(AbstractUser, PermissionsMixin):
         else:
             return "user"
 
+    def is_active(self):
+        if bool(hasattr(self, "doctor")):
+            return self.doctor.is_active
+        elif bool(hasattr(self, "guardian")):
+            return self.guardian.is_active
+        else:
+            return True
 
 class Patient(models.Model):
     first_name = models.CharField(max_length=100)
