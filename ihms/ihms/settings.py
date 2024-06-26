@@ -126,3 +126,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.IHMSUser'
 LOGIN_REDIRECT_URL = '/'
+
+MEDIA_ROOT = "media/"
