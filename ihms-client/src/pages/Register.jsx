@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import "../styles/register.css";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
+import DatePicker from "react-multi-date-picker";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
 
 axios.defaults.baseURL = import.meta.env.VITE_SERVER_DOMAIN;
 
@@ -18,7 +21,10 @@ function Register() {
     specialization: "عمومی",
     city: "",
     charityName: "",
-    password: ""
+    password: "",
+    birthdate: "",
+    gender: "آقا",
+    specialty: "ارتودنسی"
   });
   const navigate = useNavigate();
 
@@ -75,23 +81,36 @@ function Register() {
       return;
     }
 
-    const { firstname, lastname, medicalCode, nationalCode, city, charityName, password } = formDetails;
-    if (userType === "doctor" && (!firstname || !lastname || !medicalCode || !nationalCode || !city || !password)) {
+    const { firstname, lastname, medicalCode, nationalCode, city, charityName, password, birthdate, gender, specialty } = formDetails;
+    if (userType === "doctor" && (!firstname || !lastname || !medicalCode || !nationalCode || !city || !password || !birthdate || !gender || !specialty)) {
       toast.error("لطفا همه فیلدهای الزامی را پر کنید");
       return;
     }
-    if (userType === "supervisor" && (!firstname || !lastname || !nationalCode || !city || !charityName || !password)) {
+    if (userType === "supervisor" && (!firstname || !lastname || !nationalCode || !city || !charityName || !password || !birthdate || !gender)) {
       toast.error("لطفا همه فیلدهای الزامی را پر کنید");
       return;
     }
 
+    // Convert birthdate from Shamsi to Gregorian
+    const convertedBirthdate = new Date(birthdate).toISOString().split("T")[0];
+
+    const userData = {
+      user: {
+        national_id: nationalCode,
+        birthdate: convertedBirthdate,
+        password,
+        gender: gender === "آقا" ? "M" : "F",
+      },
+      specialty: userType === "doctor" ? specialty : "",
+      city,
+      medical_system_code: userType === "doctor" ? medicalCode : "",
+      practice_licence_image: file,
+    };
+
     try {
+      console.log(userData);
       await toast.promise(
-        axios.post("/user/register", {
-          ...formDetails,
-          userType,
-          pic: file,
-        }),
+        axios.post("/doctors/", userData),
         {
           pending: "در حال ثبت نام...",
           success: "کاربر با موفقیت ثبت نام شد",
@@ -180,14 +199,23 @@ function Register() {
             <div className="form-row">
               <div className="form-group">
                 <label>شهر <span className="required">*</span></label>
-                <input
-                  type="text"
+                <select
                   name="city"
-                  className="form-input"
-                  placeholder="شهر"
                   value={formDetails.city}
                   onChange={inputChange}
-                />
+                  className="form-choice"
+                >
+                  <option value="تهران">تهران</option>
+                  <option value="خرم‌آباد">خرم‌آباد</option>
+                  <option value="لاهیجان">لاهیجان</option>
+                  <option value="آمل">آمل</option>
+                  <option value="اردبیل">اردبیل</option>
+                  <option value="شیراز">شیراز</option>
+                  <option value="اراک">اراک</option>
+                  <option value="کرج">کرج</option>
+                  <option value="اصفهان">اصفهان</option>
+                  <option value="نظرآباد">نظرآباد</option>
+                </select>
               </div>
               <div className="form-group">
                 <label>رمز عبور <span className="required">*</span></label>
@@ -201,6 +229,56 @@ function Register() {
                 />
               </div>
             </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>تاریخ تولد <span className="required">*</span></label>
+                <DatePicker
+                  calendar={persian}
+                  locale={persian_fa}
+                  value={formDetails.birthdate}
+                  onChange={(date) => setFormDetails({ ...formDetails, birthdate: date })}
+                  format="YYYY/MM/DD"
+                  className="form-input"
+                  placeholder="تاریخ تولد"
+                />
+              </div>
+              <div className="form-group">
+                <label>جنسیت <span className="required">*</span></label>
+                <select
+                  name="gender"
+                  value={formDetails.gender}
+                  onChange={inputChange}
+                  className="form-choice"
+                >
+                  <option value="آقا">آقا</option>
+                  <option value="خانم">خانم</option>
+                </select>
+              </div>
+            </div>
+            {userType === "doctor" && (
+              <div className="form-row">
+                <div className="form-group">
+                  <label>تخصص <span className="required">*</span></label>
+                  <select
+                    name="specialty"
+                    value={formDetails.specialty}
+                    onChange={inputChange}
+                    className="form-choice"
+                  >
+                    <option value="ارتودنسی">ارتودنسی</option>
+                    <option value="پریودنتولوژی">پریودنتولوژی</option>
+                    <option value="دندانپزشکی کودکان">دندانپزشکی کودکان</option>
+                    <option value="اندودنتیکس">اندودنتیکس</option>
+                    <option value="پروتزهای دندانی">پروتزهای دندانی</option>
+                    <option value="جراحی دهان، فک و صورت">جراحی دهان، فک و صورت</option>
+                    <option value="پروتزهای دندانی ثابت و متحرک">پروتزهای دندانی ثابت و متحرک</option>
+                    <option value="رادیولوژی دهان و دندان">رادیولوژی دهان و دندان</option>
+                    <option value="دندانپزشکی ترمیمی">دندانپزشکی ترمیمی</option>
+                    <option value="دندانپزشکی زیبایی">دندانپزشکی زیبایی</option>
+                  </select>
+                </div>
+              </div>
+            )}
             <div className="form-row">
               <div className="form-group">
                 <label>تصویر پروانه پزشکی یا کارت ملی <span className="required">*</span></label>
