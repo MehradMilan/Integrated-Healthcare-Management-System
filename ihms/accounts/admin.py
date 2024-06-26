@@ -6,11 +6,8 @@ from .models import IHMSUser, Doctor, Guardian, Patient
 
 
 class IHMSUserAdmin(UserAdmin):
-    list_display = ('national_id', 'first_name', 'last_name', 'is_staff', "role")
+    list_display = ('national_id', 'first_name', 'last_name', 'is_staff', "role", "get_is_active")
     search_fields = ('national_id', 'first_name', 'last_name')
-    fieldsets = UserAdmin.fieldsets + (
-        (None, {'fields': ('national_id', 'birthdate', 'gender')}),
-    )
 
 
 class DoctorAdmin(ModelAdmin):
@@ -19,7 +16,7 @@ class DoctorAdmin(ModelAdmin):
 
 
 class GuardianAdmin(ModelAdmin):
-    list_display = ('user', 'charity_org_name', 'city', 'is_active')
+    list_display = ('pk', 'user', 'charity_org_name', 'city', 'is_active')
     search_fields = ('user', 'charity_org_name', 'city', 'is_active')
 
 

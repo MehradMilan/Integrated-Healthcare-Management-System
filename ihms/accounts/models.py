@@ -96,7 +96,7 @@ class IHMSUser(AbstractUser, PermissionsMixin):
         else:
             return "user"
 
-    def is_active(self):
+    def get_is_active(self):
         if bool(hasattr(self, "doctor")):
             return self.doctor.is_active
         elif bool(hasattr(self, "guardian")):
@@ -104,17 +104,9 @@ class IHMSUser(AbstractUser, PermissionsMixin):
         else:
             return True
 
-class Patient(models.Model):
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    national_id = models.CharField(max_length=10, validators=[validate_iranian_national_id], unique=True)
-    birth_date = models.DateField()
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    phone_number = models.CharField(max_length=15, unique=True, blank=True, null=True)
-    address = models.CharField(max_length=255)
-    latitude = models.DecimalField(max_digits=9, decimal_places=6)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6)
-    city = models.CharField(max_length=50)
+
+class MedicalFile(models.Model):
+    pass
 
 
 class Guardian(models.Model):
@@ -124,6 +116,24 @@ class Guardian(models.Model):
     charity_org_name = models.CharField(max_length=100)
     national_id_card_image = models.URLField()
     is_active = models.BooleanField(default=False)
+
+
+class Patient(models.Model):
+    medical_file = models.OneToOneField(MedicalFile, on_delete=models.CASCADE, primary_key=True)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    national_id = models.CharField(max_length=10, validators=[validate_iranian_national_id], unique=True, blank=True,
+                                   null=True)
+    birth_date = models.DateField()
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    city = models.CharField(max_length=50)
+    guardian = models.ForeignKey(Guardian, on_delete=models.CASCADE)
+    profile_picture = models.URLField()
+
+    def save(self, *args, **kwargs):
+        if not self.medical_file_id:
+            self.medical_file = MedicalFile.objects.create()
+        super().save(*args, **kwargs)
 
 
 class Doctor(models.Model):

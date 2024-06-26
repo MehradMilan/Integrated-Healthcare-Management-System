@@ -1,5 +1,43 @@
 from rest_framework import serializers
-from .models import Doctor, IHMSUser, Guardian
+from .models import Doctor, IHMSUser, Guardian, Patient, MedicalFile
+
+
+class MedicalFileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MedicalFile
+        fields = '__all__'
+
+
+class PatientSerializer(serializers.ModelSerializer):
+    medical_file = MedicalFileSerializer()
+
+    class Meta:
+        model = Patient
+        fields = '__all__'
+
+    def create(self, validated_data):
+        medical_file_data = validated_data.pop('medical_file')
+        medical_file = MedicalFile.objects.create(**medical_file_data)
+        medical_file.save()
+        patient = Patient.objects.create(medical_file=medical_file, **validated_data)
+        patient.save()
+        return patient
+
+    def update(self, instance, validated_data):
+        medical_file_data = validated_data.pop('medical_file')
+
+        medical_file = instance.medical_file
+
+        if medical_file_data:
+            for attr, value in medical_file_data.items():
+                setattr(medical_file, attr, value)
+            medical_file.save()
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
 
 
 class IHMSUserSerializer(serializers.ModelSerializer):
@@ -8,10 +46,9 @@ class IHMSUserSerializer(serializers.ModelSerializer):
         fields = ['national_id', 'birthdate', 'gender', 'password']
 
     def create(self, validated_data):
-        instance = super().create(validated_data)
+        instance = super().create(**validated_data)
         instance.set_password(validated_data['password'])
         instance.save()
-        print(f"{instance.password=}")
         return instance
 
     def update(self, instance, validated_data):
@@ -34,7 +71,6 @@ class DoctorSerializer(serializers.ModelSerializer):
         user_data = validated_data.pop('user')
         user = IHMSUser.objects.create_user(**user_data)
         user.save()
-        print(f"my {user.password=}")
         doctor = Doctor.objects.create(user=user, **validated_data)
         return doctor
 
