@@ -55,8 +55,15 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
 
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',  # Add your frontend URL here
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5173',  # Add your frontend URL here
+]
 ROOT_URLCONF = 'ihms.urls'
 
 TEMPLATES = [

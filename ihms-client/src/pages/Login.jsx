@@ -52,8 +52,10 @@ function Login() {
         }
       );
 
-      const is_doctor = response.data.is_doctor;
-      const is_guardian = response.data.is_guardian;
+      const { is_doctor, is_guardian } = response.data;
+      const csrfToken = response.headers['x-csrftoken'];
+
+      localStorage.setItem('csrfToken', csrfToken);
         
       if (response.status === 200 && is_doctor) {
         toast.success("ثبت‌نام موفقیت‌آمیز بود و حساب کاربری شما فعال شده است.");
