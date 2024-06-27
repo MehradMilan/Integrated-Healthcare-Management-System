@@ -43,7 +43,7 @@ class PatientSerializer(serializers.ModelSerializer):
 class IHMSUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = IHMSUser
-        fields = ['national_id', 'birthdate', 'gender', 'password']
+        fields = ['first_name', 'last_name', 'national_id', 'birthdate', 'gender', 'password']
 
     def create(self, validated_data):
         instance = super().create(**validated_data)
@@ -75,9 +75,9 @@ class DoctorSerializer(serializers.ModelSerializer):
         return doctor
 
     def update(self, instance, validated_data):
+        print(f"{validated_data=}")
         user_data = validated_data.pop('user', None)
         user = instance.user
-
         if user_data:
             for attr, value in user_data.items():
                 setattr(user, attr, value)

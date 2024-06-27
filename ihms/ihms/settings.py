@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'widget_tweaks',
     'corsheaders',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -133,3 +134,13 @@ AUTH_USER_MODEL = 'accounts.IHMSUser'
 LOGIN_REDIRECT_URL = '/'
 
 MEDIA_ROOT = "media/"
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+
+CSRF_COOKIE_SAMESITE = 'Lax' # or 'None' if frontend and backend are on different domains and using HTTPS
+SESSION_COOKIE_SAMESITE = 'Lax' # or 'None'
