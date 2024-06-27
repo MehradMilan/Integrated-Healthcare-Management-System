@@ -15,7 +15,7 @@ body {
   
   .dashboard-header {
     width: 100%;
-    background-color: #007bff;
+    background-color: #323a43;
     color: white;
     padding: 1rem;
     display: flex;
@@ -54,6 +54,7 @@ body {
   
   .profile-section {
     margin-bottom: 2rem;
+    color: #343a40;
   }
   
   .profile-details {
@@ -126,7 +127,7 @@ body {
     margin-left: 0.5rem;
     margin-right: 1.5rem;
     background-color: #f9f9f9;
-    color: orange;
+    color: #323a43;
   }
   
   button {
