@@ -11,10 +11,10 @@ from .data import CITIES
 
 
 def validate_adult_age(value):
-    if value - datetime.datetime.now() <= datetime.timedelta(days=18 * 365.25):
+    if datetime.datetime.now().date() - value <= datetime.timedelta(days=18 * 365.25):
         raise ValidationError(_('An adult must be above 18 years of age.'), code='invalid')
 
-    if value - datetime.datetime.now() >= datetime.timedelta(days=120 * 365.25):
+    if value - datetime.datetime.now().date() >= datetime.timedelta(days=120 * 365.25):
         raise ValidationError(_('An adult must be below 120 years of age.'), code='invalid')
 
 

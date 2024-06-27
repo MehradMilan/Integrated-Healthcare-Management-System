@@ -1,5 +1,6 @@
+from django.contrib.auth import authenticate, logout, login
 from django.shortcuts import render
-from django.contrib.auth import authenticate, login, logout
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import BasePermission
@@ -29,6 +30,7 @@ def get_doctors_schedule(request):
     if not request.user.role() == 'doctor':
         return Response(f"User is not a doctor {request.user.national_id}", 400)
     return Response([DoctorTime.objects.filter(doctor=request.user.doctor).values("time", "patient").all()])
+
 
 @api_view(['POST'])
 @permission_classes([CustomAuthorization])
@@ -107,6 +109,13 @@ def get_guardians_patients(request):
     return Response({"error": "user is not authenticated"}, 400)
 
 
+@api_view(['GET'])
+def logout_view(request):
+    logout(request)
+    return Response("logged out", 200)
+
+
+@csrf_exempt
 @api_view(['POST'])
 def login_view(request):
     national_id = request.data.get('national_id')

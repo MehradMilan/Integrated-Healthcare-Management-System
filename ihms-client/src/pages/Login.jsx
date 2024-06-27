@@ -4,6 +4,8 @@ import "../styles/login.css";
 import axios from "axios";
 import toast from "react-hot-toast";
 import ReCAPTCHA from "react-google-recaptcha";
+import GuardianDashboard from "./Guardian-Dashboard";
+import { getCookie } from "../lib/csrf";
 
 axios.defaults.baseURL = import.meta.env.VITE_SERVER_DOMAIN;
 
@@ -44,6 +46,10 @@ function Login() {
           national_id,
           password,
           // captcha
+        }, {
+          headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+          }
         }),
         {
           pending: "در حال ورود...",
@@ -53,9 +59,6 @@ function Login() {
       );
 
       const { is_doctor, is_guardian } = response.data;
-      const csrfToken = response.headers['x-csrftoken'];
-
-      localStorage.setItem('csrfToken', csrfToken);
         
       if (response.status === 200 && is_doctor) {
         toast.success("ثبت‌نام موفقیت‌آمیز بود و حساب کاربری شما فعال شده است.");
@@ -67,6 +70,7 @@ function Login() {
         toast.info("حساب کاربری شما هنوز فعال‌سازی نشده‌است. می‌توانید با مدیریت ما در ارتباط باشید.");
       }
     } catch (error) {
+      console.log(error)
       toast.error("خطایی رخ داده است");
     }
   };

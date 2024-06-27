@@ -22,4 +22,5 @@ urlpatterns = [
     path('api/get_doctors_schedule', views.get_doctors_schedule, name="get_doctors_schedule"),
     path('api/login/', views.login_view, name='login'),
     path('api/autologin/', views.autologin, name='autologin'),
+    path('api/logout/', views.logout_view, name='logout'),
 ]
