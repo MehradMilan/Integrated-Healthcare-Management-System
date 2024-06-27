@@ -52,6 +52,19 @@ def update_doctor(request):
     return Response("user is not authenticated", status=status.HTTP_401_UNAUTHORIZED)
 
 
+@api_view(['PATCH'])
+def update_guardian(request):
+    if request.user.is_authenticated:
+        if request.user.role() == 'guardian':
+            serializer = GuardianSerializer(request.user.guardian, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response("user is not a guardian", status=status.HTTP_401_UNAUTHORIZED)
+    return Response("user is not authenticated", status=status.HTTP_401_UNAUTHORIZED)
+
+
 @api_view(['POST'])
 def create_guardian(request):
     if request.method == 'POST':

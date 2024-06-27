@@ -7,6 +7,7 @@ app_name = 'accounts'
 urlpatterns = [
     path('api/doctors/', views.create_doctor, name='create_doctor'),
     path('api/update_doctor/', views.update_doctor, name='update_doctor'),
+    path('api/update_guardian/', views.update_guardian, name='update_guardian'),
     path('api/guardians/', views.create_guardian, name='create_guardian'),
     path('api/patients/', views.create_patient, name='create_patient'),
     path('api/get_user_info/', views.get_user_info, name='get_user_info'),
