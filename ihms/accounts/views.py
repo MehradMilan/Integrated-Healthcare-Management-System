@@ -57,6 +57,16 @@ def get_user_info(request):
         return Response(IHMSUserSerializer(request.user).data, 200)
     return Response({"error": "user is not authenticated"}, 400)
 
+
+@api_view(['GET'])
+def get_guardians_patients(request):
+    if request.user.is_authenticated:
+        if request.user.role() == 'guardian':
+            return Response(PatientSerializer(request.user.guardian.patient_set.all(), many=True).data, 200)
+        return Response("user is not a guardian", 400)
+    return Response({"error": "user is not authenticated"}, 400)
+
+
 @api_view(['POST'])
 def login_view(request):
     national_id = request.data.get('national_id')
