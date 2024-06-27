@@ -127,6 +127,9 @@ class Guardian(models.Model):
     city = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=15, validators=[validate_iranian_phone], blank=True, null=True)
     charity_org_name = models.CharField(max_length=100)
+    address = models.CharField(max_length=255, null=True, blank=True)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
     national_id_card_image = models.URLField()
     is_active = models.BooleanField(default=False)
 
@@ -142,6 +145,7 @@ class Patient(models.Model):
     city = models.CharField(max_length=50)
     guardian = models.ForeignKey(Guardian, on_delete=models.CASCADE)
     profile_picture = models.URLField()
+    registration_date = models.DateField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
         if not self.medical_file_id:

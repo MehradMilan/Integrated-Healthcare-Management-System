@@ -6,6 +6,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 
+from .models import Doctor, Guardian, Patient
 from .serializers import DoctorSerializer, GuardianSerializer, PatientSerializer, IHMSUserSerializer
 
 
@@ -112,3 +113,35 @@ def login_view(request):
             return Response({'error': 'User is inactive.'}, status=403)
     else:
         return Response({'error': 'Invalid credentials.'}, status=401)
+
+
+@api_view(['GET'])
+def get_doctors_coordinates(request):
+    return Response(list(Doctor.objects.all().values("latitude", "longitude")))
+
+
+@api_view(['GET'])
+def get_guardians_coordinates(request):
+    return Response(list(Guardian.objects.all().values("latitude", "longitude")))
+
+
+@api_view(['GET'])
+def get_doctors_count(request):
+    return Response({"count": Doctor.objects.all().count()})
+
+
+@api_view(['GET'])
+def get_guardians_count(request):
+    return Response({"count": Guardian.objects.all().count()})
+
+
+@api_view(['GET'])
+def get_patients_count(request):
+    return Response({"count": Patient.objects.all().count()})
+
+
+@api_view(['GET'])
+def get_patients_registration_time(request):
+    data = list(Patient.objects.all().values("registration_date"))
+    data = sorted(data)
+    return Response(data, 200)
