@@ -1,11 +1,21 @@
+import datetime
 import re
-from enum import Enum
 
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
+from .data import CITIES
+
+
+def validate_adult_age(value):
+    if value - datetime.datetime.now() <= datetime.timedelta(days=18 * 365.25):
+        raise ValidationError(_('An adult must be above 18 years of age.'), code='invalid')
+
+    if value - datetime.datetime.now() >= datetime.timedelta(days=120 * 365.25):
+        raise ValidationError(_('An adult must be below 120 years of age.'), code='invalid')
 
 
 def validate_iranian_national_id(value):
@@ -80,7 +90,7 @@ class IHMSUser(AbstractUser, PermissionsMixin):
     )
 
     national_id = models.CharField(max_length=10, validators=[validate_iranian_national_id], unique=True)
-    birthdate = models.DateField()
+    birthdate = models.DateField(validators=[validate_adult_age])
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
 
     objects = IHMSUserManager()
@@ -94,7 +104,7 @@ class IHMSUser(AbstractUser, PermissionsMixin):
         elif bool(hasattr(self, "guardian")):
             return "guardian"
         else:
-            return "user"
+            return "admin"
 
     def get_is_active(self):
         if bool(hasattr(self, "doctor")):
@@ -103,6 +113,9 @@ class IHMSUser(AbstractUser, PermissionsMixin):
             return self.guardian.is_active
         else:
             return True
+
+    def age(self):
+        return (datetime.datetime.now().date() - self.birthdate).days / 365.25
 
 
 class MedicalFile(models.Model):
