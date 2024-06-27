@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 
-from .serializers import DoctorSerializer, GuardianSerializer, PatientSerializer
+from .serializers import DoctorSerializer, GuardianSerializer, PatientSerializer, IHMSUserSerializer
 
 
 class CustomAuthorization(BasePermission):
@@ -46,6 +46,16 @@ def create_guardian(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['GET'])
+def get_user_info(request):
+    if request.user.is_authenticated:
+        if request.user.role() == 'guardian':
+            return Response(GuardianSerializer(request.user.guardian).data, 200)
+        elif request.user.role() == 'doctor':
+            return Response(DoctorSerializer(request.user.doctor).data, 200)
+        return Response(IHMSUserSerializer(request.user).data, 200)
+    return Response({"error": "user is not authenticated"}, 400)
 
 @api_view(['POST'])
 def login_view(request):
