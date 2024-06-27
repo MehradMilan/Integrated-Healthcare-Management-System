@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Doctor, IHMSUser, Guardian, Patient, MedicalFile
+from .models import Doctor, IHMSUser, Guardian, Patient, MedicalFile, DoctorTime
 
 
 class MedicalFileSerializer(serializers.ModelSerializer):
@@ -38,6 +38,12 @@ class PatientSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+class DoctorTimeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DoctorTime
+        fields = "__all__"
 
 
 class IHMSUserSerializer(serializers.ModelSerializer):

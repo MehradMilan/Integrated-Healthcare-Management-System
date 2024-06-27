@@ -1,13 +1,16 @@
+import datetime
+
 from django.contrib.auth import authenticate, logout, login
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
 
 from .models import Doctor, Guardian, Patient, DoctorTime, IHMSUser
-from .serializers import DoctorSerializer, GuardianSerializer, PatientSerializer, IHMSUserSerializer
+from .serializers import DoctorSerializer, GuardianSerializer, PatientSerializer, IHMSUserSerializer, \
+    DoctorTimeSerializer
 
 
 class CustomAuthorization(BasePermission):
@@ -17,6 +20,13 @@ class CustomAuthorization(BasePermission):
         if hasattr(request.user, 'guardian'):
             return True
         return False
+
+
+class IsDoctor(BasePermission):
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated or not request.user.role() == "doctor":
+            return False
+        return True
 
 
 def get_doctors_calendar(request):
@@ -29,7 +39,29 @@ def get_doctors_schedule(request):
         return Response("User is not authenticated", 400)
     if not request.user.role() == 'doctor':
         return Response(f"User is not a doctor {request.user.national_id}", 400)
-    return Response([DoctorTime.objects.filter(doctor=request.user.doctor).values("time", "patient").all()])
+    return Response(list(DoctorTime.objects.filter(doctor=request.user.doctor).values("id", "time", "patient").all()))
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated, IsDoctor])
+def delete_doctor_time(request):
+    id = request.data.get("id")
+    DoctorTime.objects.filter(id=id).delete()
+    return Response({"message": f"id {id} deleted"}, status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated, IsDoctor])
+def add_doctor_time(request):
+    time = request.data.get("time")
+    if not time:
+        return Response("Missing time", 400)
+    try:
+        date_object = datetime.datetime.strptime(time, "%Y-%m-%dT%H:%M:%S")
+        instance = DoctorTime.objects.create(doctor=request.user.doctor, time=date_object)
+        return Response(DoctorTimeSerializer(instance).data, 200)
+    except ValueError:
+        return Response("Invalid time. expected format %Y-%m-%dT%H:%M:%S", 400)
 
 
 @api_view(['POST'])

@@ -183,5 +183,5 @@ class Doctor(models.Model):
 class DoctorTime(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     time = models.DateTimeField()
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, blank=True)
 

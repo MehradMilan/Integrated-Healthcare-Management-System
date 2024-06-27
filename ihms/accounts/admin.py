@@ -16,9 +16,9 @@ class DoctorAdmin(ModelAdmin):
 
 
 class DoctorTimeAdmin(ModelAdmin):
-    list_display = ('doctor', 'time', 'patient')
+    list_display = ('id', 'doctor', 'time', 'patient')
     list_filter = ('doctor', 'time', 'patient')
-    search_fields = ('doctor', 'time', 'patient')
+    search_fields = ('id', 'doctor', 'time', 'patient')
 
 
 class GuardianAdmin(ModelAdmin):
