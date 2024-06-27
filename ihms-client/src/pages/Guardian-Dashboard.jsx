@@ -4,6 +4,7 @@ import GoogleMapReact from "google-map-react";
 import axios from "axios";
 import { getCookie } from '../lib/csrf';
 import { fetchWithAuth } from '../lib/authfetch';
+import Logout from '../lib/logout';
 
 axios.defaults.withCredentials = true;
 
@@ -41,6 +42,20 @@ const GuardianDashboard = () => {
   const handleSaveClick = (field) => {
     setIsEditing({ ...isEditing, [field]: false });
     updateUserDetails(field);
+  };
+
+  const handleLogout = async () => {
+    fetchWithAuth(import.meta.env.VITE_SERVER_DOMAIN + '/logout/', {
+        method: 'GET',
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('logout successful:', data);
+        navigate('/login/')
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
   };
 
   const setUserDetails = () => {
@@ -84,6 +99,7 @@ const GuardianDashboard = () => {
           <li><a href="#">اضافه کردن بیمار</a></li>
           <li><a href="#">فرزندان تحت حمایت</a></li>
           <li><a href="#">رزرو ویزیت</a></li>
+          <li><a href="#" onClick={handleLogout}>خروج</a></li>
         </ul>
       </div>
       <div className="dashboard-main">
@@ -91,8 +107,8 @@ const GuardianDashboard = () => {
           <h1>داشبورد سرپرستان</h1>
         </div>
         <div className="profile-section">
-          <h2>پروفایل {user["gender"] === 'M' ? "آقای": "خانوم"} {user["user"]["first_name"] + " " 
-          + user["user"]["last_name"]}</h2>
+          <h2>پروفایل {user["gender"] === 'M' ? "آقای": "خانوم"} {user["user"] != undefined ? user["user"]["first_name"] + " " 
+          + user["user"]["last_name"]: "رئیس"}</h2>
           <div className="profile-details">
             <div className="profile-info">
               {['phone_number', 'charity_org_name', 'address'].map((field) => (

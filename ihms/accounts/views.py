@@ -159,8 +159,7 @@ def login_view(request):
     if user is not None:
         if user.get_is_active:
             login(request, user)
-            return Response({'message': 'Login successful.', 'is_doctor': bool(hasattr(user, "doctor")),
-                             'is_guardian': bool(hasattr(user, "guardian"))}, status=200)
+            return Response({'message': 'Login successful.', 'role': request.user.role()}, status=200)
         else:
             return Response({'error': 'User is inactive.'}, status=403)
     else:

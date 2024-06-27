@@ -80,7 +80,7 @@ class IHMSUserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
-        return self.create_user(national_id, password, **extra_fields)
+        return self.create_user(national_id, password, birthdate=datetime.datetime.now(), **extra_fields)
 
 
 class IHMSUser(AbstractUser, PermissionsMixin):
