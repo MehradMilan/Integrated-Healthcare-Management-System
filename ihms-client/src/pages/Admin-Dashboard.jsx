@@ -1,6 +1,9 @@
 import React from 'react';
 import '../styles/dashboard.css';
+import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import axios from 'axios';
+import { fetchWithAuth } from '../lib/authfetch';
 
 const data = [
   { name: 'Page A', uv: 4000, pv: 2400, amt: 2400 },
@@ -22,11 +25,28 @@ const pieData = [
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    fetchWithAuth(import.meta.env.VITE_SERVER_DOMAIN + '/logout/', {
+        method: 'GET',
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('logout successful:', data);
+        navigate('/login/')
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  };
+
   return (
     <div className="dashboard-container">
       <div className="dashboard-sidebar">
         <ul>
           <li><a href="#">مشاهده‌ی نمودارها</a></li>
+          <li><a href="#" onClick={handleLogout}>خروج</a></li>
         </ul>
       </div>
       <div className="dashboard-main">
