@@ -131,6 +131,17 @@
     </div>
 </div>
 <script>
+    function formatDateTime(date) {
+        const year = date.getUTCFullYear();
+        const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+        const day = String(date.getUTCDate()).padStart(2, '0');
+        const hours = String(date.getUTCHours()).padStart(2, '0');
+        const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+        const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+
+        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+    }
+
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -146,188 +157,194 @@
         return cookieValue;
     }
 
-
-    document.addEventListener('DOMContentLoaded', function () {
+    function updateCalendar() {
         const calendar = document.querySelector('.calendar');
         const weekHeader = document.getElementById('week-header');
+        const currentDate = new Date(new Date().toISOString());
+        currentDate.setDate(currentDate.getDate() + weekOffset * 7);
+
+        const startOfWeek = new Date(currentDate);
+        startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+        startOfWeek.setHours(0, 0, 0, 0);
+
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        endOfWeek.setHours(23, 59, 59, 0);
+
+        const options = {month: 'long', day: 'numeric', year: 'numeric'};
+        const startOfWeekFormatted = startOfWeek.toLocaleDateString(undefined, options);
+        const endOfWeekFormatted = endOfWeek.toLocaleDateString(undefined, options);
+
+        weekHeader.textContent = `${startOfWeekFormatted} - ${endOfWeekFormatted}`;
+
+        calendar.innerHTML = `
+        <div class="header header-time"></div>
+        <div class="header">Sunday</div>
+        <div class="header">Monday</div>
+        <div class="header">Tuesday</div>
+        <div class="header">Wednesday</div>
+        <div class="header">Thursday</div>
+        <div class="header">Friday</div>
+        <div class="header">Saturday</div>
+    `;
+
+        for (let hour = 0; hour < 24; hour++) {
+            const timeLabel = document.createElement('div');
+            timeLabel.classList.add('time-label');
+            timeLabel.textContent = `${hour}:00`;
+            calendar.appendChild(timeLabel);
+
+            for (let day = 0; day < 7; day++) {
+                const hourCell = document.createElement('div');
+                hourCell.classList.add('hour-cell');
+                calendar.appendChild(hourCell);
+            }
+        }
+
+        fetchSchedule(startOfWeek, endOfWeek);
+    }
+
+    function fetchSchedule(startOfWeek, endOfWeek) {
+        fetch('/api/get_doctors_schedule/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                updateSchedule(data, startOfWeek, endOfWeek);
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    }
+
+    function updateSchedule(data, start, end) {
+        const calendar = document.querySelector('.calendar');
+        let timed_indices = [];
+
+        data.forEach(schedule => {
+            const time = new Date(schedule.time);
+            console.log(`fixing the ${time} cell for timed cells and the condition value is ${time <= end} ${time <= end}`);
+            if (time >= start && time <= end) {
+                const dayIndex = (time.getDay()  % 7) + 1;
+                const hour = time.getHours();
+                const cellIndex = (hour + 1) * 8 + dayIndex;
+                timed_indices.push(cellIndex);
+                const cell = calendar.children[cellIndex];
+                if (schedule.patient === null) {
+                    cell.textContent = 'empty';
+                    cell.classList.add('empty-cell');
+                    cell.addEventListener('click', () => handleDelete(schedule.id));
+                } else {
+                    cell.textContent = 'full';
+                }
+            }
+        });
+
+        for (let i = 0; i < calendar.children.length; i++) {
+            const cell = calendar.children[i];
+            if (timed_indices.includes(i) || cell.textContent !== "") {
+                continue;
+            }
+            if (i !== 0) {
+                const day = (i % 8) - 1;
+                const hour = Math.floor(i / 8) - 1;
+                const cellDate = new Date(start);
+                cellDate.setDate(cellDate.getDate() + day);
+                cellDate.setHours(hour);
+                cellDate.setMinutes(0);
+                cellDate.setSeconds(0);
+                cellDate.setMilliseconds(0);
+                const now = new Date();
+                if (cellDate >= now) {
+                    const button = document.createElement('button');
+                    button.textContent = 'volunteer';
+                    button.classList.add('volunteer');
+                    button.addEventListener('click', () => handleVolunteer(cellDate));
+                    cell.appendChild(button);
+                }
+            }
+        }
+    }
+
+    function handleDelete(scheduleId) {
+        fetch('/api/delete_doctor_time/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Cookie': `sessionid=${getCookie('sessionid')}`
+            },
+            body: JSON.stringify({id: scheduleId})
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                updateCalendar();
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    }
+
+    function handleVolunteer(cellDate) {
+        const timeString = formatDateTime(cellDate);
+        console.log(`${cellDate} -> ${timeString}`)
+        fetch('/api/add_doctor_time/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Cookie': `sessionid=${getCookie('sessionid')}`
+            },
+            body: JSON.stringify({time: timeString})
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Volunteer time added:', data);
+                updateCalendar();
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    }
+
+    function addEventListeners() {
         const prevWeekButton = document.getElementById('prev-week');
         const nextWeekButton = document.getElementById('next-week');
-        let weekOffset = 0;
 
-        function updateCalendar() {
-            // Clear previous hour cells
-            calendar.innerHTML = `
-                    <div class="header header-time"></div>
-                    <div class="header">Sunday</div>
-                    <div class="header">Monday</div>
-                    <div class="header">Tuesday</div>
-                    <div class="header">Wednesday</div>
-                    <div class="header">Thursday</div>
-                    <div class="header">Friday</div>
-                    <div class="header">Saturday</div>
-                `;
-
-            const currentDate = new Date();
-            currentDate.setDate(currentDate.getDate() + weekOffset * 7);
-
-            const startOfWeek = new Date(currentDate);
-            startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
-
-            // Get the end date of the week (Saturday)
-            const endOfWeek = new Date(startOfWeek);
-            endOfWeek.setDate(startOfWeek.getDate() + 6);
-
-            // Format dates as 'Month Day, Year'
-            const options = {month: 'long', day: 'numeric', year: 'numeric'};
-            const startOfWeekFormatted = startOfWeek.toLocaleDateString(undefined, options);
-            const endOfWeekFormatted = endOfWeek.toLocaleDateString(undefined, options);
-
-            // Set the week header text
-            weekHeader.textContent = `${startOfWeekFormatted} - ${endOfWeekFormatted}`;
-
-            for (let hour = 0; hour < 24; hour++) {
-                // Create time label cell
-                const timeLabel = document.createElement('div');
-                timeLabel.classList.add('time-label');
-                timeLabel.textContent = `${hour}:00`;
-                calendar.appendChild(timeLabel);
-
-                // Create 7 hour cells for each day
-                for (let day = 0; day < 7; day++) {
-                    const hourCell = document.createElement('div');
-                    hourCell.classList.add('hour-cell');
-                    calendar.appendChild(hourCell);
-                }
-            }
-
-            // Fetch the doctor's schedule and update the calendar
-            fetch('/api/get_doctors_schedule/', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok ' + response.statusText);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log(data);
-                    updateSchedule(data, startOfWeek, endOfWeek);
-                })
-                .catch(error => {
-                    console.error('There has been a problem with your fetch operation:', error);
-                });
-        }
-
-        function updateSchedule(data, start, end) {
-            let timed_indices = [];
-
-            data.forEach(schedule => {
-                const time = new Date(schedule.time);
-
-                if (time >= start && time <= end) {
-                    const dayIndex = (time.getDay() + 6) % 7;
-                    const hour = time.getHours();
-                    const cellIndex = (hour + 1) * 8 + (dayIndex + 1); // Calculate cell index
-                    timed_indices.push(cellIndex);
-                    const cell = calendar.children[cellIndex];
-                    if (schedule.patient === null) {
-                        cell.textContent = 'empty';
-                        cell.classList.add('empty-cell')
-                        cell.addEventListener('click', function () {
-                            fetch('/api/delete_doctor_time/', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRFToken': getCookie('csrftoken'),
-                                    'Cookie': `sessionid=${getCookie('sessionid')}`
-                                },
-                                body: JSON.stringify({id: schedule.id})
-                            })
-                                .then(response => {
-                                    if (!response.ok) {
-                                        throw new Error('Network response was not ok ' + response.statusText);
-                                    }
-                                    updateCalendar()
-                                    return null;
-                                })
-                                .catch(error => {
-                                    console.error('There has been a problem with your fetch operation:', error);
-                                });
-                        })
-                    } else {
-                        cell.textContent = 'full';
-                    }
-                }
-            });
-
-            for (let i = 0; i < calendar.children.length; i++) {
-                const cell = calendar.children[i];
-                if (timed_indices.includes(i) || cell.textContent !== "") {
-                    continue;
-                }
-                if (i !== 0) {
-                    const day = Math.floor((i % 8));
-                    const hour = Math.floor(i / 8) - 1;
-                    const cellDate = new Date(start);
-                    cellDate.setDate(cellDate.getDate() + day);
-                    cellDate.setHours(hour);
-                    cellDate.setMinutes(0);
-                    cellDate.setSeconds(0);
-                    cellDate.setMilliseconds(0);
-                    const now = new Date();
-                    if (cellDate >= now) {
-                        const button = document.createElement('button');
-                        button.textContent = 'volunteer';
-                        button.classList.add('volunteer');
-                        button.addEventListener('click', function () {
-                            const timeString = cellDate.toISOString().split('.')[0];
-                            const now = new Date()
-                            fetch('/api/add_doctor_time/', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRFToken': getCookie('csrftoken'),
-                                    'Cookie': `sessionid=${getCookie('sessionid')}`
-                                },
-                                body: JSON.stringify({time: timeString})
-                            })
-                                .then(response => {
-                                    if (!response.ok) {
-                                        throw new Error('Network response was not ok ' + response.statusText);
-                                    }
-                                    return response.json();
-                                })
-                                .then(data => {
-                                    console.log('Volunteer time added:', data);
-                                    updateCalendar();
-
-                                })
-                                .catch(error => {
-                                    console.error('There has been a problem with your fetch operation:', error);
-                                });
-                        });
-                        cell.appendChild(button);
-                    }
-                }
-            }
-        }
-
-        prevWeekButton.addEventListener('click', function () {
+        prevWeekButton.addEventListener('click', () => {
             weekOffset--;
             updateCalendar();
         });
 
-        nextWeekButton.addEventListener('click', function () {
+        nextWeekButton.addEventListener('click', () => {
             weekOffset++;
             updateCalendar();
         });
+    }
 
+    let weekOffset = 0;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        addEventListeners();
         updateCalendar();
     });
+
 </script>
 </body>
 </html>
