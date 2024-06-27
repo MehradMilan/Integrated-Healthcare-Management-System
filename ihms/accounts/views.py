@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, logout, login
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
@@ -96,6 +96,13 @@ def get_guardians_patients(request):
     return Response({"error": "user is not authenticated"}, 400)
 
 
+@api_view(['GET'])
+def logout_view(request):
+    logout(request)
+    return Response("logged out", 200)
+
+
+@csrf_exempt
 @api_view(['POST'])
 def login_view(request):
     national_id = request.data.get('national_id')
