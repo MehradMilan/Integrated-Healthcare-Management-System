@@ -58,18 +58,15 @@ function Login() {
         }
       );
 
-      const { is_doctor, is_guardian } = response.data;
+      const role = response.data['role']
         
-      if (response.status === 200 && is_doctor) {
+      if (response.status === 200 && role === "docor") {
         toast.success("ثبت‌نام موفقیت‌آمیز بود و حساب کاربری شما فعال شده است.");
-        console.log("sag");
         navigate("/doctor-dashboard");
-      } else if (response.status === 200 && is_guardian) {
-        console.log("meow");
+      } else if (response.status === 200 && role === "guardian") {
         toast.success("ثبت‌نام موفقیت‌آمیز بود و حساب کاربری شما فعال شده است.");
         navigate("/guardian-dashboard");
       } else if (response.status === 200) {
-        console.log("an");
         toast.success("سلام رئیس!");
         navigate("/admin-dashboard");
       } else {

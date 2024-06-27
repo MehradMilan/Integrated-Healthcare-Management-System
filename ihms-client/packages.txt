@@ -6,3 +6,8 @@ react-google-recaptcha
 react-multi-date-picker
 google-map-react
 recharts
+react-advance-jalaali-datepicker
+react-chartjs-2
+papaparse
+regression
+react-countup

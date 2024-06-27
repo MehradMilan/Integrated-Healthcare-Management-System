@@ -74,8 +74,8 @@ body {
   
   .profile-picture {
     border-radius: 50%;
-    width: 100px;
-    height: 100px;
+    width: 150px;
+    height: 150px;
   }
   
    .edit-picture-button {
@@ -167,7 +167,10 @@ body {
   .charts-container {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    text-align: right; /* Center charts horizontally */
     gap: 20px;
+    color: #323a43;
   }
   
   .chart-section {
@@ -175,9 +178,32 @@ body {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 90%; /* Adjust the width for better alignment */
+    display: flex;
+    flex-direction: column; /* Ensure vertical stacking */
+    align-items: center;
   }
   
-  .chart-section h2 {
+  .chart-section {
     text-align: center;
     margin-bottom: 20px;
+    color: #323a43;
   }
+
+  .separator {
+    display: block;
+    border: 0;
+    height: 1px;
+    margin: -10px 0;
+    background: #e0e0e0;
+    width: 100%;
+  }
+  
+  .counters-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  
