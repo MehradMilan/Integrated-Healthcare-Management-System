@@ -9,6 +9,7 @@ import { CookiesProvider, useCookies } from 'react-cookie'
 
 // const Home = lazy(() => import("./pages/Home"));
 const GuardianDashboard = lazy(() => import("./pages/Guardian-Dashboard"));
+const DoctorDashboard = lazy(() => import("./pages/Doctor-Dashboard"));
 const AdminDashboard = lazy(() => import("./pages/Admin-Dashboard"));
 const AddChild = lazy(() => import("./pages/Add-Child"));
 // const Appointments = lazy(() => import("./pages/Appointments"));
@@ -46,6 +47,14 @@ function App() {
             element={
               <Public>
                 <GuardianDashboard />
+              </Public>
+            }
+          />
+          <Route
+            path="/doctor-dashboard"
+            element={
+              <Public>
+                <DoctorDashboard />
               </Public>
             }
           />

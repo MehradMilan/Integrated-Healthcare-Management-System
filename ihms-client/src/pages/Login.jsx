@@ -60,7 +60,7 @@ function Login() {
 
       const role = response.data['role']
         
-      if (response.status === 200 && role === "docor") {
+      if (response.status === 200 && role === "doctor") {
         toast.success("ثبت‌نام موفقیت‌آمیز بود و حساب کاربری شما فعال شده است.");
         navigate("/doctor-dashboard");
       } else if (response.status === 200 && role === "guardian") {
