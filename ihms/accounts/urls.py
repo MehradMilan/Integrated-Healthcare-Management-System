@@ -5,6 +5,7 @@ from . import views
 app_name = 'accounts'
 
 urlpatterns = [
+    path('doctors_calendar', views.get_doctors_calendar, name='doctors_calendar'),
     path('api/doctors/', views.create_doctor, name='create_doctor'),
     path('api/update_doctor/', views.update_doctor, name='update_doctor'),
     path('api/update_guardian/', views.update_guardian, name='update_guardian'),
@@ -18,5 +19,7 @@ urlpatterns = [
     path('api/get_guardians_count/', views.get_guardians_count, name='get_guardians_count'),
     path('api/get_patients_registration_time/', views.get_patients_registration_time,
          name='get_patients_registration_time'),
+    path('api/get_doctors_schedule', views.get_doctors_schedule, name="get_doctors_schedule"),
     path('api/login/', views.login_view, name='login'),
+    path('api/autologin/', views.autologin, name='autologin'),
 ]

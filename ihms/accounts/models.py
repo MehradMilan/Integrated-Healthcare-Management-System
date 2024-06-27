@@ -178,3 +178,10 @@ class Doctor(models.Model):
     medical_system_code = models.CharField(max_length=10, unique=True)
     practice_licence_image = models.URLField()
     is_active = models.BooleanField(default=False)
+
+
+class DoctorTime(models.Model):
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    time = models.DateTimeField()
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True)
+

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8x24 Grid Calendar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .calendar-container {
+            width: 90%;
+            max-width: 1200px;
+            background-color: white;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+        }
+
+        .week-header {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .week-header button {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 0 50px;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: 60px repeat(7, 1fr);
+            grid-template-rows: 50px repeat(24, 1fr);
+            background-color: white;
+        }
+
+        .header {
+            background-color: #f7f7f7;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .time-label, .hour-cell {
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .time-label {
+            background-color: #f7f7f7;
+            text-align: right;
+            padding-right: 10px;
+        }
+
+        .hour-cell {
+            border-right: 1px solid #ddd;
+        }
+
+        .header-time {
+            border-right: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+<div class="calendar-container">
+    <div class="week-header">
+        <button id="prev-week">&lt;</button>
+        <div id="week-header"></div>
+        <button id="next-week">&gt;</button>
+    </div>
+    <div class="calendar">
+        <!-- Time Header -->
+        <div class="header header-time"></div>
+        <div class="header">Sunday</div>
+        <div class="header">Monday</div>
+        <div class="header">Tuesday</div>
+        <div class="header">Wednesday</div>
+        <div class="header">Thursday</div>
+        <div class="header">Friday</div>
+        <div class="header">Saturday</div>
+
+        <!-- Time Labels and Hour Cells -->
+        <!-- Loop to create 24 rows for hours -->
+    </div>
+</div>
+<script>
+    fetch('/api/get_doctors_schedule', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            // 'X-CSRFToken': csrftoken, // include the CSRF token in the header
+        }
+        // body: JSON.stringify({
+        //     key1: 'value1',
+        //     key2: 'value2',
+        // }), // include the request payload
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json(); // parsing the response to JSON
+        })
+        .then(data => {
+            console.log(data); // handle the data from the response
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+        });
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendar = document.querySelector('.calendar');
+        const weekHeader = document.getElementById('week-header');
+        const prevWeekButton = document.getElementById('prev-week');
+        const nextWeekButton = document.getElementById('next-week');
+        let weekOffset = 0;
+
+        function updateCalendar() {
+            // Clear previous hour cells
+            calendar.innerHTML = `
+                    <div class="header header-time"></div>
+                    <div class="header">Sunday</div>
+                    <div class="header">Monday</div>
+                    <div class="header">Tuesday</div>
+                    <div class="header">Wednesday</div>
+                    <div class="header">Thursday</div>
+                    <div class="header">Friday</div>
+                    <div class="header">Saturday</div>
+                `;
+
+            const currentDate = new Date();
+            currentDate.setDate(currentDate.getDate() + weekOffset * 7);
+
+            const startOfWeek = new Date(currentDate);
+            startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+
+            // Get the end date of the week (Saturday)
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+            // Format dates as 'Month Day, Year'
+            const options = {month: 'long', day: 'numeric', year: 'numeric'};
+            const startOfWeekFormatted = startOfWeek.toLocaleDateString(undefined, options);
+            const endOfWeekFormatted = endOfWeek.toLocaleDateString(undefined, options);
+
+            // Set the week header text
+            weekHeader.textContent = `${startOfWeekFormatted} - ${endOfWeekFormatted}`;
+
+            for (let hour = 0; hour < 24; hour++) {
+                // Create time label cell
+                const timeLabel = document.createElement('div');
+                timeLabel.classList.add('time-label');
+                timeLabel.textContent = `${hour}:00`;
+                calendar.appendChild(timeLabel);
+
+                // Create 7 hour cells for each day
+                for (let day = 0; day < 7; day++) {
+                    const hourCell = document.createElement('div');
+                    hourCell.classList.add('hour-cell');
+                    calendar.appendChild(hourCell);
+                }
+            }
+        }
+
+        prevWeekButton.addEventListener('click', function () {
+            weekOffset--;
+            updateCalendar();
+        });
+
+        nextWeekButton.addEventListener('click', function () {
+            weekOffset++;
+            updateCalendar();
+        });
+
+        updateCalendar();
+    });
+</script>
+</body>
+</html>

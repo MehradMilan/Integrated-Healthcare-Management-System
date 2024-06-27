@@ -1,12 +1,11 @@
-from django.contrib.auth import authenticate, login
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render
+from django.contrib.auth import authenticate, login, logout
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 
-from .models import Doctor, Guardian, Patient
+from .models import Doctor, Guardian, Patient, DoctorTime, IHMSUser
 from .serializers import DoctorSerializer, GuardianSerializer, PatientSerializer, IHMSUserSerializer
 
 
@@ -18,6 +17,18 @@ class CustomAuthorization(BasePermission):
             return True
         return False
 
+
+def get_doctors_calendar(request):
+    return render(request, 'doctors_calendar.html')
+
+
+@api_view(['GET'])
+def get_doctors_schedule(request):
+    if not request.user.is_authenticated:
+        return Response("User is not authenticated", 400)
+    if not request.user.role() == 'doctor':
+        return Response(f"User is not a doctor {request.user.national_id}", 400)
+    return Response([DoctorTime.objects.filter(doctor=request.user.doctor).values("time", "patient").all()])
 
 @api_view(['POST'])
 @permission_classes([CustomAuthorization])
@@ -118,6 +129,16 @@ def login_view(request):
 @api_view(['GET'])
 def get_doctors_coordinates(request):
     return Response(list(Doctor.objects.all().values("latitude", "longitude")))
+
+
+@api_view(['POST'])
+def autologin(request):
+    if request.user.is_authenticated:
+        logout(request)
+    nid = request.data["national_id"]
+    user = IHMSUser.objects.get(national_id=nid)
+    login(request, user)
+    return Response(200)
 
 
 @api_view(['GET'])
