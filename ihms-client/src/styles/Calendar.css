@@ -1,0 +1,83 @@
+  
+  .calendar-container {
+    width: 90%;
+    max-width: 1200px;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+  }
+  
+  .week-header {
+    text-align: center;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .week-header button {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 0 50px;
+  }
+  
+  .calendar {
+    display: grid;
+    grid-template-columns: 60px repeat(7, 1fr);
+    grid-template-rows: 50px repeat(24, 1fr);
+    background-color: white;
+  }
+  
+  .time-label, .hour-cell {
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .time-label {
+    background-color: #f7f7f7;
+    text-align: right;
+    padding: 0px 10px;
+  }
+  
+  .hour-cell {
+    border-right: 1px solid #ddd;
+  }
+  
+  .empty-cell {
+    background-color: #a1c1f7;
+    cursor: pointer;
+  }
+  
+  .empty-cell:hover {
+    background-color: tomato;
+  }
+  
+  .header-time {
+    border-right: 1px solid #ddd;
+  }
+  
+  button.volunteer {
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+    border: none; /* No border */
+    padding: 5px 20px; /* Padding */
+    text-align: center; /* Centered text */
+    text-decoration: none; /* No underline */
+    display: inline-block; /* Inline block */
+    font-size: 14px; /* Font size */
+    margin: 2px 1px; /* Some margin */
+    cursor: pointer; /* Pointer/hand icon on hover */
+    border-radius: 5px; /* Rounded corners */
+    transition: background-color 0.3s ease; /* Smooth background color change */
+  }
+  
+  button.volunteer:hover {
+    background-color: #45a049; /* Darker green on hover */
+  }
+  

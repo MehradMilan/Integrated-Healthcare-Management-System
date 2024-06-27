@@ -148,10 +148,10 @@ const GuardianDashboard = () => {
       </div>
       <div className="dashboard-main">
         <div className="dashboard-header">
-          <h1 id="dashboard">داشبورد سرپرستان</h1>
+          <h1 id="dashboard">داشبورد سرپرست</h1>
         </div>
         <div className="profile-section">
-          <h2>پروفایل {user["gender"] === 'M' ? "آقای": "خانوم"} {user["user"] != undefined ? user["user"]["first_name"] + " " 
+          <h2>پروفایل {user["user"]["gender"] === 'M' ? "آقای": "خانوم"} {user["user"] != undefined ? user["user"]["first_name"] + " " 
           + user["user"]["last_name"]: "رئیس"}</h2>
           <div className="profile-details">
             <div className="profile-info">

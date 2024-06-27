@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import '../styles/dashboard.css';
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
 import { getCookie } from '../lib/csrf';
 import { fetchWithAuth } from '../lib/authfetch';
 import Logout from '../lib/logout';
+import Calendar from '../components/Calendar';
+import '../styles/dashboard.css';
+import { useNavigate } from 'react-router-dom';
 
 axios.defaults.withCredentials = true;
 
 const DoctorDashboard = () => {
-  const [isEditing, setIsEditing] = useState({ phone_number: false, charity_org_name: false, address: false, medical_system_code: false});
+  const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState({ phone_number: false, charity_org_name: false, address: false, medical_system_code: false });
   const [user, setUser] = useState({
     user: {
       first_name: '',
@@ -28,9 +31,8 @@ const DoctorDashboard = () => {
     latitude: undefined,
     longitude: undefined  
   });
-  const [location, setLocation] = useState({ lat: 0, lng: 0 });
 
-  const fieldMap = {phone_number: 'شماره‌ی تماس', charity_org_name: 'موسسه‌ی خیریه', address: 'آدرس', medical_system_code: 'کد نظام پزشکی'}
+  const fieldMap = { phone_number: 'شماره‌ی تماس', charity_org_name: 'موسسه‌ی خیریه', address: 'آدرس', medical_system_code: 'کد نظام پزشکی' };
 
   const handleEditClick = (field) => {
     setIsEditing({ ...isEditing, [field]: true });
@@ -49,8 +51,8 @@ const DoctorDashboard = () => {
 
   const handleLogout = async () => {
     fetchWithAuth(import.meta.env.VITE_SERVER_DOMAIN + '/logout/', {
-        method: 'GET',
-      })
+      method: 'GET',
+    })
       .then(response => response.json())
       .then(data => {
         console.log('logout successful:', data);
@@ -65,14 +67,14 @@ const DoctorDashboard = () => {
     fetchWithAuth(import.meta.env.VITE_SERVER_DOMAIN + '/get_user_info/', {
       method: 'GET',
     })
-    .then(response => response.json())
-    .then(data => {
-      console.log(data);
-      setUser(data);
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-    });
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        setUser(data);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
   };
 
   const updateUserDetails = (field) => {
@@ -81,13 +83,13 @@ const DoctorDashboard = () => {
       method: 'PATCH',
       body: JSON.stringify(updatedField),
     })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Update successful:', data);
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-    });
+      .then(response => response.json())
+      .then(data => {
+        console.log('Update successful:', data);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
   };
 
   useEffect(() => {
@@ -109,25 +111,22 @@ const DoctorDashboard = () => {
           <h1 id="dashboard">داشبورد دکتر</h1>
         </div>
         <div className="profile-section">
-          <h2>پروفایل {user["gender"] === 'M' ? "آقای": "خانوم"} {user["user"] != undefined ? user["user"]["first_name"] + " " 
-          + user["user"]["last_name"]: "رئیس"}</h2>
+          <h2>پروفایل {user["user"]["gender"] === 'M' ? "آقای" : "خانوم"} {user["user"] != undefined ? user["user"]["first_name"] + " " + user["user"]["last_name"] : "رئیس"}</h2>
           <div className="profile-details">
             <div className="profile-info">
-                <div className="profile-info">
-                {['medical_system_code'].map((field) => (
-                    <div className="form-group" key={field}>
-                    <label>{fieldMap[field] + ":"}</label>
-                    {isEditing[field] ? (
-                        <input 
-                        type="text" 
-                        value={user[field]} 
-                        />
-                    ) : (
-                        <p>{user[field]}</p>
-                    )}
-                    </div>
-                ))}
+              {['medical_system_code'].map((field) => (
+                <div className="form-group" key={field}>
+                  <label>{fieldMap[field] + ":"}</label>
+                  {isEditing[field] ? (
+                    <input 
+                      type="text" 
+                      value={user[field]} 
+                    />
+                  ) : (
+                    <p>{user[field]}</p>
+                  )}
                 </div>
+              ))}
               {['phone_number', 'address'].map((field) => (
                 <div className="form-group" key={field}>
                   <label>{fieldMap[field] + ":"}</label>
@@ -153,11 +152,8 @@ const DoctorDashboard = () => {
             </div>
           </div>
           <h2 id="visit-time">تعیین زمان‌های ویزیت</h2>
-          <div className="map-section">
-          </div>
+          <Calendar />
           <h2 id="reserved-times">زمان‌های رزرو شده</h2>
-          <div className="map-section">
-          </div>
         </div>
       </div>
     </div>
