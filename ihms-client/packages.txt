@@ -5,3 +5,4 @@ axios
 react-google-recaptcha
 react-multi-date-picker
 google-map-react
+recharts

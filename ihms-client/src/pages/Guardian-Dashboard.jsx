@@ -91,8 +91,8 @@ const GuardianDashboard = () => {
           <h1>داشبورد سرپرستان</h1>
         </div>
         <div className="profile-section">
-          <h2>پروفایل {user["gender"] === 'M' ? "آقای": "خانوم"} {user["user"]["first_name"] + " " 
-          + user["user"]["last_name"]}</h2>
+          <h2>پروفایل {user["gender"] === 'M' ? "آقای": "خانوم"} {user["user"] != undefined ? user["user"]["first_name"] + " " 
+          + user["user"]["last_name"]: "رئیس"}</h2>
           <div className="profile-details">
             <div className="profile-info">
               {['phone_number', 'charity_org_name', 'address'].map((field) => (

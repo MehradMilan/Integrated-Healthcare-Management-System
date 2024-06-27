@@ -62,10 +62,16 @@ function Login() {
         
       if (response.status === 200 && is_doctor) {
         toast.success("ثبت‌نام موفقیت‌آمیز بود و حساب کاربری شما فعال شده است.");
+        console.log("sag");
         navigate("/doctor-dashboard");
       } else if (response.status === 200 && is_guardian) {
+        console.log("meow");
         toast.success("ثبت‌نام موفقیت‌آمیز بود و حساب کاربری شما فعال شده است.");
         navigate("/guardian-dashboard");
+      } else if (response.status === 200) {
+        console.log("an");
+        toast.success("سلام رئیس!");
+        navigate("/admin-dashboard");
       } else {
         toast.info("حساب کاربری شما هنوز فعال‌سازی نشده‌است. می‌توانید با مدیریت ما در ارتباط باشید.");
       }
