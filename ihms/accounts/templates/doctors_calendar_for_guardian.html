@@ -28,7 +28,7 @@
         .week-header {
             text-align: center;
             font-size: 1.5em;
-            margin-bottom: 10px;
+            margin-bottom: 20px; /* Increased margin for spacing */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -40,6 +40,18 @@
             font-size: 1.5em;
             cursor: pointer;
             padding: 0 50px;
+        }
+
+        #choice-box {
+            width: 60%; /* Adjusted width for a better look */
+            padding: 8px; /* Padding for better appearance */
+            margin-bottom: 20px; /* Space before the calendar starts */
+            font-size: 1em; /* Font size matching other elements */
+            cursor: pointer; /* Indicates it's selectable */
+            border: 1px solid #ccc; /* Subtle border */
+            border-radius: 5px; /* Rounded corners */
+            appearance: none; /* Removes default styling of select box in webkit browsers */
+            background-color: white; /* Background color */
         }
 
         .calendar {
@@ -113,6 +125,7 @@
         }
 
     </style>
+
 </head>
 <body>
 <div class="calendar-container">
@@ -137,7 +150,7 @@
     </div>
 </div>
 <script>
-    const global_doctor_id = {{ doctor_id }};
+    const global_doctor_id = {{ doctor_id }}
 
     function formatDateTime(date) {
         const year = date.getUTCFullYear();
