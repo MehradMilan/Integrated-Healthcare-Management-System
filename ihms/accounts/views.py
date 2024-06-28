@@ -33,8 +33,28 @@ def get_doctors_calendar(request):
     return render(request, 'doctors_calendar.html')
 
 
+def get_doctors_calendar_for_guardian(request):
+    return render(request, 'doctors_calendar_for_guardian.html', context={"doctor_id": 1})
+
+
+@api_view(['POST'])
+def reserve_time_for_patient(request):
+    doctor_time_id = request.data.get("doctor_time_id")
+    patient_national_id = request.data.get("patient_national_id")
+    if not doctor_time_id or not patient_national_id:
+        return Response({"error": f"{doctor_time_id=}, {patient_national_id=}"})
+    doctor_time = DoctorTime.objects.get(id=doctor_time_id)
+    doctor_time.patient = Patient.objects.get(national_id=patient_national_id)
+    doctor_time.save()
+    return Response(DoctorTimeSerializer(doctor_time).data, 200)
+
+
 @api_view(['GET'])
 def get_doctors_schedule(request):
+    doctor_id = request.GET.get('doctor_id', None)
+    if doctor_id:
+        return Response(
+            list(DoctorTime.objects.filter(doctor__user_id=str(doctor_id)).values("id", "time", "patient").all()))
     if not request.user.is_authenticated:
         return Response("User is not authenticated", 400)
     if not request.user.role() == 'doctor':

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8x24 Grid Calendar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .calendar-container {
+            width: 90%;
+            max-width: 1200px;
+            background-color: white;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+        }
+
+        .week-header {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .week-header button {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 0 50px;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: 60px repeat(7, 1fr);
+            grid-template-rows: 50px repeat(24, 1fr);
+            background-color: white;
+        }
+
+        .header {
+            background-color: #f7f7f7;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .time-label, .hour-cell {
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .time-label {
+            background-color: #f7f7f7;
+            text-align: right;
+            padding: 0px 10px;
+        }
+
+        .hour-cell {
+            border-right: 1px solid #ddd;
+            padding: 5px 5px;
+        }
+
+        .full {
+            background-color: #e50f0f;
+        }
+
+        .empty-cell {
+            background-color: #a1c1f7;
+            cursor: pointer;
+        }
+
+        .empty-cell:hover {
+            background-color: tomato;
+        }
+
+        .header-time {
+            border-right: 1px solid #ddd;
+        }
+
+        button.reserve {
+            background-color: #4CAF50; /* Green background */
+            color: white; /* White text */
+            border: none; /* No border */
+            padding: 5px 20px; /* Padding */
+            text-align: center; /* Centered text */
+            text-decoration: none; /* No underline */
+            display: inline-block; /* Inline block */
+            font-size: 14px; /* Font size */
+            margin: 2px 1px; /* Some margin */
+            cursor: pointer; /* Pointer/hand icon on hover */
+            border-radius: 5px; /* Rounded corners */
+            transition: background-color 0.3s ease; /* Smooth background color change */
+        }
+
+        button.reserve:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+
+    </style>
+</head>
+<body>
+<div class="calendar-container">
+    <div class="week-header">
+        <button id="prev-week">&lt;</button>
+        <div id="week-header"></div>
+        <button id="next-week">&gt;</button>
+    </div>
+    <select id="choice-box"></select>
+    <div class="calendar">
+        <!-- Time Header -->
+        <div class="header header-time"></div>
+        <div class="header">Sunday</div>
+        <div class="header">Monday</div>
+        <div class="header">Tuesday</div>
+        <div class="header">Wednesday</div>
+        <div class="header">Thursday</div>
+        <div class="header">Friday</div>
+        <div class="header">Saturday</div>
+
+        <!-- Time Labels and Hour Cells -->
+    </div>
+</div>
+<script>
+    const global_doctor_id = {{ doctor_id }};
+
+    function formatDateTime(date) {
+        const year = date.getUTCFullYear();
+        const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+        const day = String(date.getUTCDate()).padStart(2, '0');
+        const hours = String(date.getUTCHours()).padStart(2, '0');
+        const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+        const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+
+        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function getSelectedValue() {
+        let choiceBox = document.getElementById('choice-box');
+        let selectedValue = choiceBox.value; // Gets the currently selected value
+        return selectedValue;
+    }
+
+    function fetchChoices() {
+        fetch(`/api/get_guardians_patients/`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+
+        })
+            .then(response => response.json())
+            .then(data => {
+                const choiceBox = document.getElementById('choice-box');
+                data.forEach(choice => {
+                    const option = document.createElement('option');
+                    option.textContent = `${choice.first_name} ${choice.last_name} - ${choice.national_id}`;
+                    option.value = choice.national_id;
+                    choiceBox.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching choices:', error));
+    }
+
+    function updateCalendar() {
+        const calendar = document.querySelector('.calendar');
+        const weekHeader = document.getElementById('week-header');
+        const currentDate = new Date(new Date().toISOString());
+        currentDate.setDate(currentDate.getDate() + weekOffset * 7);
+
+        const startOfWeek = new Date(currentDate);
+        startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+        startOfWeek.setHours(0, 0, 0, 0);
+
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        endOfWeek.setHours(23, 59, 59, 0);
+
+        const options = {month: 'long', day: 'numeric', year: 'numeric'};
+        const startOfWeekFormatted = startOfWeek.toLocaleDateString(undefined, options);
+        const endOfWeekFormatted = endOfWeek.toLocaleDateString(undefined, options);
+
+        weekHeader.textContent = `${startOfWeekFormatted} - ${endOfWeekFormatted}`;
+
+        calendar.innerHTML = `
+            <div class="header header-time"></div>
+            <div class="header">Sunday</div>
+            <div class="header">Monday</div>
+            <div class="header">Tuesday</div>
+            <div class="header">Wednesday</div>
+            <div class="header">Thursday</div>
+            <div class="header">Friday</div>
+            <div class="header">Saturday</div>
+        `;
+
+        for (let hour = 0; hour < 24; hour++) {
+            const timeLabel = document.createElement('div');
+            timeLabel.classList.add('time-label');
+            timeLabel.textContent = `${hour}:00`;
+            calendar.appendChild(timeLabel);
+
+            for (let day = 0; day < 7; day++) {
+                const hourCell = document.createElement('div');
+                hourCell.classList.add('hour-cell');
+                calendar.appendChild(hourCell);
+            }
+        }
+
+        fetchSchedule(startOfWeek, endOfWeek);
+    }
+
+    function fetchSchedule(startOfWeek, endOfWeek) {
+        fetch(`/api/get_doctors_schedule/?doctor_id=${global_doctor_id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                updateSchedule(data, startOfWeek, endOfWeek);
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    }
+
+    function updateSchedule(data, start, end) {
+        const calendar = document.querySelector('.calendar');
+        let timed_indices = [];
+
+        data.forEach(schedule => {
+            const time = new Date(schedule.time);
+
+            if (time >= start && time <= end) {
+                const dayIndex = (time.getDay() % 7) + 1;
+                const hour = time.getHours();
+                const cellIndex = (hour + 1) * 8 + dayIndex;
+                timed_indices.push(cellIndex);
+                const cell = calendar.children[cellIndex];
+                if (schedule.patient === null) {
+                    const button = document.createElement('button');
+                    button.textContent = 'reserve';
+                    button.classList.add('reserve');
+                    button.addEventListener('click', () => handleReserve(schedule.id));
+                    cell.appendChild(button);
+                } else {
+                    cell.textContent = 'full';
+                    cell.classList.add('full')
+                }
+            }
+        });
+    }
+
+    function handleReserve(id) {
+        // fetch('/api/reserve_time/', {
+        fetch('/api/reserve_time/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Cookie': `sessionid=${getCookie('sessionid')}`
+            },
+            body: JSON.stringify({doctor_time_id: id, patient_national_id: getSelectedValue()})
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Time reserved:', data);
+                updateCalendar();
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    }
+
+    function addEventListeners() {
+        const prevWeekButton = document.getElementById('prev-week');
+        const nextWeekButton = document.getElementById('next-week');
+
+        prevWeekButton.addEventListener('click', () => {
+            weekOffset--;
+            updateCalendar();
+        });
+
+        nextWeekButton.addEventListener('click', () => {
+            weekOffset++;
+            updateCalendar();
+        });
+    }
+
+    let weekOffset = 0;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        addEventListeners();
+        fetchChoices();
+        updateCalendar();
+    });
+</script>
+</body>
+</html>

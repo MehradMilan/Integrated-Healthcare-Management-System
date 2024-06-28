@@ -41,6 +41,7 @@ class PatientSerializer(serializers.ModelSerializer):
 
 
 class DoctorTimeSerializer(serializers.ModelSerializer):
+    patient = PatientSerializer()
     class Meta:
         model = DoctorTime
         fields = "__all__"
