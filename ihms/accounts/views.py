@@ -33,6 +33,10 @@ def get_doctors_calendar(request):
     return render(request, 'doctors_calendar.html')
 
 
+def get_doctors_list_view(request):
+    return render(request, "doctors_list.html")
+
+
 def get_doctors_calendar_for_guardian(request):
     return render(request, 'doctors_calendar_for_guardian.html', context={"doctor_id": 1})
 
@@ -55,6 +59,11 @@ def reserve_time_for_patient(request):
     doctor_time.patient = Patient.objects.get(national_id=patient_national_id)
     doctor_time.save()
     return Response(DoctorTimeSerializer(doctor_time).data, 200)
+
+
+@api_view(['GET'])
+def get_all_doctors(request):
+    return Response(DoctorSerializer(Doctor.objects.all(), many=True).data, 200)
 
 
 @api_view(['GET'])
