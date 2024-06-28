@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
-import { getCookie } from '../lib/csrf';
 import { fetchWithAuth } from '../lib/authfetch';
 import Logout from '../lib/logout';
 import Calendar from '../components/Calendar';
 import '../styles/dashboard.css';
 import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
+import { faIR } from 'date-fns/locale'; // Import the correct locale from date-fns
 
 axios.defaults.withCredentials = true;
 
@@ -31,6 +32,7 @@ const DoctorDashboard = () => {
     latitude: undefined,
     longitude: undefined  
   });
+  const [reservedTimes, setReservedTimes] = useState([]);
 
   const fieldMap = { phone_number: 'شماره‌ی تماس', charity_org_name: 'موسسه‌ی خیریه', address: 'آدرس', medical_system_code: 'کد نظام پزشکی' };
 
@@ -77,6 +79,30 @@ const DoctorDashboard = () => {
       });
   };
 
+  const fetchReservedTimes = () => {
+    fetchWithAuth(import.meta.env.VITE_SERVER_DOMAIN + '/get_doctors_schedule/', {
+      method: 'GET',
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        const currentDate = new Date();
+        const reserved = data.filter(time => time.patient !== null).map(time => {
+          const visitDate = new Date(time.time);
+          return {
+            id: time.id,
+            time: format(visitDate, 'yyyy/MM/dd HH:mm', { locale: faIR }),
+            patient: time.patient,
+            status: visitDate > currentDate ? 'در انتظار' : 'گذشته'
+          };
+        });
+        setReservedTimes(reserved);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  };
+
   const updateUserDetails = (field) => {
     const updatedField = { [field]: user[field] };
     fetchWithAuth(import.meta.env.VITE_SERVER_DOMAIN + '/update_doctor/', {
@@ -94,6 +120,7 @@ const DoctorDashboard = () => {
 
   useEffect(() => {
     setUserDetails();
+    fetchReservedTimes();
   }, []);
 
   return (
@@ -154,6 +181,16 @@ const DoctorDashboard = () => {
           <h2 id="visit-time">تعیین زمان‌های ویزیت</h2>
           <Calendar />
           <h2 id="reserved-times">زمان‌های رزرو شده</h2>
+          <div className="reserved-times-container">
+            {reservedTimes.map((time, index) => (
+              <div className="reserved-time-card" key={index}>
+                <p>کد: {time.id}</p>
+                <p>زمان: {time.time}</p>
+                <p>کد بیمار: {time.patient}</p>
+                <p>وضعیت: {time.status}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

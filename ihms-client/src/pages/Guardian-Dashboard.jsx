@@ -5,6 +5,7 @@ import { fetchWithAuth } from '../lib/authfetch';
 import Logout from '../lib/logout';
 import { useNavigate } from 'react-router-dom';
 import GuardianCalendar from '../components/GuardianCalendar';
+import GuardianMap from '../components/GuardianMap';
 import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
@@ -43,6 +44,8 @@ const GuardianDashboard = () => {
     profile_picture: '',
   });
   const [children, setChildren] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+  const [selectedDoctor, setSelectedDoctor] = useState(null); // State for selected doctor
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState('');
 
@@ -102,6 +105,20 @@ const GuardianDashboard = () => {
       .then(data => {
         console.log(data);
         setChildren(data);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  };
+
+  const fetchDoctors = () => {
+    fetchWithAuth(import.meta.env.VITE_SERVER_DOMAIN + '/get_all_doctors/', {
+      method: 'GET',
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        setDoctors(data);
       })
       .catch((error) => {
         console.error('Error:', error);
@@ -214,6 +231,7 @@ const GuardianDashboard = () => {
   useEffect(() => {
     setUserDetails();
     fetchChildren();
+    fetchDoctors();
   }, []);
 
   return (
@@ -223,7 +241,9 @@ const GuardianDashboard = () => {
           <li><a href="#dashboard">داشبورد</a></li>
           <li><a href="#add-child">اضافه کردن بیمار</a></li>
           <li><a href="#supported-children">فرزندان تحت حمایت</a></li>
+          <li><a href="#doctors">دکترهای در دسترس</a></li>
           <li><a href="#reserve-visit">رزرو ویزیت</a></li>
+          <li><a href="#location">موقعیت شما روی نقشه</a></li>
           <li><a href="#" onClick={handleLogout}>خروج</a></li>
         </ul>
       </div>
@@ -365,8 +385,31 @@ const GuardianDashboard = () => {
             ))}
           </div>
           </div>
+          <h2 id="doctors-list">دکترهای در دسترس</h2>
+          <div id="doctors" className="map-section">
+          <div className="doctors-container">
+            {doctors.map((doctor, index) => (
+              <div 
+                className="doctor-card" 
+                key={index} 
+                onClick={() => setSelectedDoctor(doctor.user.national_id)} // Set selected doctor on click
+              >
+                <img src={doctor.practice_licence_image || "https://via.placeholder.com/150"} alt="doctor-profile" className="doctor-picture" />
+                <p>{doctor.user.first_name} {doctor.user.last_name}</p>
+                <p>{doctor.city}</p>
+                <p>{doctor.specialty}</p>
+              </div>
+            ))}
+          </div>
+          </div>
           <h2 id="reserve-visit">رزرو ویزیت</h2>
-          <GuardianCalendar doctorId='0490999409'/>
+          {selectedDoctor ? (
+            <GuardianCalendar doctorId={selectedDoctor} />
+          ) : (
+            <p>لطفا یک دکتر را انتخاب کنید</p>
+          )}
+          <h2 id="location">موقعیت شما روی نقشه</h2>
+          <GuardianMap />
         </div>
       </div>
     </div>

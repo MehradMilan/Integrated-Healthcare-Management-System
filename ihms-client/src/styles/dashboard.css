@@ -254,29 +254,60 @@ body {
     outline: none;
   }
 
-  .children-container {
+  .children-container, .doctor-container {
     display: flex;
     flex-wrap: wrap;
     max-height: 300px; /* Adjust as needed */
     overflow-y: auto;
   }
   
-  .child-card {
+  .child-card, .doctor-card {
     width: 15%;
     margin: 1%;
     padding: 10px;
     border: 3px solid #ddd;
-    border-radius: 5px;
+    border-radius: 15px;
     text-align: center;
   }
+
+  .doctor-card:hover {
+    width: 16%;
+    margin: 1%;
+    padding: 10px;
+    border: 3px solid #ddd;
+    border-radius: 15px;
+    text-align: center;
+    cursor: pointer;
+    background-color: #7e7e7e;
+    color: #ddd;
+  }
   
-  .child-picture {
+  .child-picture, .doctor-picture {
     width: 100%;
     height: auto;
     border-radius: 50%;
   }
   
-  .child-card p {
+  .child-card p, .doctor-card p {
+    margin: 5px 0;
+  }
+  
+  .reserved-times-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .reserved-time-card {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+  }
+  
+  .reserved-time-card p {
     margin: 5px 0;
   }
   
