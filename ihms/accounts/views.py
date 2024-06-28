@@ -37,6 +37,10 @@ def get_doctors_calendar_for_guardian(request):
     return render(request, 'doctors_calendar_for_guardian.html', context={"doctor_id": 1})
 
 
+def get_guardian_location(request):
+    return render(request, 'guardian_location.html')
+
+
 @api_view(['POST'])
 def reserve_time_for_patient(request):
     doctor_time_id = request.data.get("doctor_time_id")
@@ -188,7 +192,7 @@ def login_view(request):
 
 @api_view(['GET'])
 def get_doctors_coordinates(request):
-    return Response(list(Doctor.objects.all().values("latitude", "longitude")))
+    return Response(list(Doctor.objects.all().values("user__first_name", "user__last_name", "latitude", "longitude")))
 
 
 @api_view(['POST'])
@@ -204,6 +208,12 @@ def autologin(request):
 @api_view(['GET'])
 def get_guardians_coordinates(request):
     return Response(list(Guardian.objects.all().values("latitude", "longitude")))
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, CustomAuthorization])
+def get_guardian_coordinates(request):
+    return Response({"id": request.user.guardian.user.id, "latitude": request.user.guardian.latitude, "longitude": request.user.guardian.longitude})
 
 
 @api_view(['GET'])
