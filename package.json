@@ -5,6 +5,7 @@
     "react-chartjs-2": "^5.2.0",
     "react-cookie": "^7.1.4",
     "react-countup": "^6.5.3",
+    "react-toastify": "^10.0.5",
     "recharts": "^2.12.7",
     "regression": "^2.0.1"
   }

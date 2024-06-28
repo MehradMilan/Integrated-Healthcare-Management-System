@@ -69,12 +69,15 @@ def get_all_doctors(request):
 @api_view(['GET'])
 def get_doctors_schedule(request):
     doctor_id = request.GET.get('doctor_id', None)
+    print(f"{doctor_id=}")
     if doctor_id:
-        return Response(
+        if len(doctor_id) < 5:
+            return Response(
             list(DoctorTime.objects.filter(doctor__user_id=str(doctor_id)).values("id", "time",
-                                                                                  "patient").all())) if len(
-            doctor_id) < 5 else Response(list(
-            DoctorTime.objects.filter(doctor__user__national_id=str(doctor_id)).values("id", "time", "patient").all()))
+                                                                                  "patient").all()))
+        else:
+            print(f"{DoctorTime.objects.filter(doctor__user__national_id=str(doctor_id)).count()}")
+            return Response(list(DoctorTime.objects.filter(doctor__user__national_id=str(doctor_id)).values("id", "time", "patient").all()))
 
     if not request.user.is_authenticated:
         return Response("User is not authenticated", 400)

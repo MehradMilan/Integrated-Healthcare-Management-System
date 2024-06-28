@@ -111,12 +111,13 @@ body {
     color: #343a40;
   }
   
-  .form-group input {
+  .form-group input, select {
     flex: 1;
     padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 4px;
     margin-left: 0.5rem;
+    margin-right: 20px;
   }
   
   .form-group p {
@@ -206,4 +207,76 @@ body {
     gap: 20px;
   }
   
+  .uploaded-image {
+    margin-top: 10px;
+    position: relative;
+    display: table-caption;
+  }
+  
+  .uploaded-image img.thumbnail {
+    max-width: 100px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+  }
+  
+  .uploaded-image .remove-image-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 2px 6px;
+    font-size: 14px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 1rem;
+    color: #666666;
+  }
+  
+  .form-input, .form-choice {
+    width: 75%;
+    padding: 12px;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+    margin-right: 30px;
+  }
+  
+  .form-input:focus, .form-choice:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+
+  .children-container {
+    display: flex;
+    flex-wrap: wrap;
+    max-height: 300px; /* Adjust as needed */
+    overflow-y: auto;
+  }
+  
+  .child-card {
+    width: 15%;
+    margin: 1%;
+    padding: 10px;
+    border: 3px solid #ddd;
+    border-radius: 5px;
+    text-align: center;
+  }
+  
+  .child-picture {
+    width: 100%;
+    height: auto;
+    border-radius: 50%;
+  }
+  
+  .child-card p {
+    margin: 5px 0;
+  }
   
