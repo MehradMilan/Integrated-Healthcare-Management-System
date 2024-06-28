@@ -64,8 +64,8 @@ def get_doctors_schedule(request):
         return Response(
             list(DoctorTime.objects.filter(doctor__user_id=str(doctor_id)).values("id", "time",
                                                                                   "patient").all())) if len(
-            doctor_id) < 5 else list(
-            DoctorTime.objects.filter(doctor__user__national_id=str(doctor_id)).values("id", "time", "patient").all())
+            doctor_id) < 5 else Response(list(
+            DoctorTime.objects.filter(doctor__user__national_id=str(doctor_id)).values("id", "time", "patient").all()))
 
     if not request.user.is_authenticated:
         return Response("User is not authenticated", 400)

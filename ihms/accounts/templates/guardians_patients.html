@@ -68,7 +68,7 @@
                         const patientItem = document.createElement('li');
                         patientItem.className = 'patient';
                         patientItem.innerHTML = `
-                            <span>${patient.user.first_name} ${patient.user.last_name} - ${patient.user.national_id}</span>
+                            <span>${patient.first_name} ${patient.last_name} - ${patient.national_id}</span>
                             <button onclick="deletePatient('${patient.user.national_id}')">Delete</button>
                         `;
                         patientList.appendChild(patientItem);
