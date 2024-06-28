@@ -135,7 +135,7 @@ class Guardian(models.Model):
 
 
 class Patient(models.Model):
-    medical_file = models.OneToOneField(MedicalFile, on_delete=models.CASCADE, primary_key=True)
+    medical_file = models.OneToOneField(MedicalFile, on_delete=models.CASCADE, null=True, blank=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     national_id = models.CharField(max_length=10, validators=[validate_iranian_national_id], unique=True, blank=True,

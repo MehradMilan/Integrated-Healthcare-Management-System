@@ -11,3 +11,4 @@ react-chartjs-2
 papaparse
 regression
 react-countup
+react-toastify
