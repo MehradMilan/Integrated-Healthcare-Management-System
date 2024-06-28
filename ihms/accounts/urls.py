@@ -9,6 +9,7 @@ urlpatterns = [
     path('doctors_calendar_for_guardian/', views.get_doctors_calendar_for_guardian, name='doctors_calendar_for_guardian'),
     path('guardian_location/', views.get_guardian_location, name='guardian_location'),
     path('guardian_patients/', views.get_guardians_patients_view, name='get_guardians_patients'),
+    path('doctors_list/', views.get_doctors_list_view, name='get_doctors_list_view'),
     path('api/add_doctor_time/', views.add_doctor_time, name='add_doctor_time'),
     path('api/delete_doctor_time/', views.delete_doctor_time, name='delete_doctor_time'),
     path('api/doctors/', views.create_doctor, name='create_doctor'),
@@ -29,6 +30,7 @@ urlpatterns = [
          name='get_patients_registration_time'),
     path('api/get_doctors_schedule/', views.get_doctors_schedule, name="get_doctors_schedule"),
     path('api/login/', views.login_view, name='login'),
+    path('api/get_all_doctors/', views.get_all_doctors, name='get_all_doctors'),
     path('api/autologin/', views.autologin, name='autologin'),
     path('api/logout/', views.logout_view, name='logout'),
 ]
