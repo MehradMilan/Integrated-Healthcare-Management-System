@@ -41,6 +41,10 @@ def get_guardian_location(request):
     return render(request, 'guardian_location.html')
 
 
+def get_guardians_patients_view(request):
+    return render(request, 'guardians_patients.html')
+
+
 @api_view(['POST'])
 def reserve_time_for_patient(request):
     doctor_time_id = request.data.get("doctor_time_id")
@@ -58,7 +62,11 @@ def get_doctors_schedule(request):
     doctor_id = request.GET.get('doctor_id', None)
     if doctor_id:
         return Response(
-            list(DoctorTime.objects.filter(doctor__user_id=str(doctor_id)).values("id", "time", "patient").all()))
+            list(DoctorTime.objects.filter(doctor__user_id=str(doctor_id)).values("id", "time",
+                                                                                  "patient").all())) if len(
+            doctor_id) < 5 else list(
+            DoctorTime.objects.filter(doctor__user__national_id=str(doctor_id)).values("id", "time", "patient").all())
+
     if not request.user.is_authenticated:
         return Response("User is not authenticated", 400)
     if not request.user.role() == 'doctor':
@@ -213,7 +221,8 @@ def get_guardians_coordinates(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, CustomAuthorization])
 def get_guardian_coordinates(request):
-    return Response({"id": request.user.guardian.user.id, "latitude": request.user.guardian.latitude, "longitude": request.user.guardian.longitude})
+    return Response({"id": request.user.guardian.user.id, "latitude": request.user.guardian.latitude,
+                     "longitude": request.user.guardian.longitude})
 
 
 @api_view(['GET'])

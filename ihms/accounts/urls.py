@@ -8,6 +8,7 @@ urlpatterns = [
     path('doctors_calendar/', views.get_doctors_calendar, name='doctors_calendar'),
     path('doctors_calendar_for_guardian/', views.get_doctors_calendar_for_guardian, name='doctors_calendar_for_guardian'),
     path('guardian_location/', views.get_guardian_location, name='guardian_location'),
+    path('guardian_patients/', views.get_guardians_patients_view, name='get_guardians_patients'),
     path('api/add_doctor_time/', views.add_doctor_time, name='add_doctor_time'),
     path('api/delete_doctor_time/', views.delete_doctor_time, name='delete_doctor_time'),
     path('api/doctors/', views.create_doctor, name='create_doctor'),

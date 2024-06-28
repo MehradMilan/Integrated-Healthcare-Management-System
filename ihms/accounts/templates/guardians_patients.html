@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .patient-list {
+            list-style: none;
+            padding: 0;
+        }
+        .patient {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        button {
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #addPatientBtn {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Patient Management</h1>
+    <ul class="patient-list" id="patientList"></ul>
+    <button id="addPatientBtn">Add New Patient</button>
+
+    <script>
+        document.getElementById('addPatientBtn').addEventListener('click', function() {
+            // Code to add a new patient
+            console.log('Add new patient button clicked');
+            // Here you would typically open a form dialog or redirect to a form page
+        });
+
+        function fetchPatients() {
+            fetch('/api/get_guardians_patients/')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const patientList = document.getElementById('patientList');
+                    patientList.innerHTML = ''; // Clear existing entries
+                    data.forEach(patient => {
+                        const patientItem = document.createElement('li');
+                        patientItem.className = 'patient';
+                        patientItem.innerHTML = `
+                            <span>${patient.user.first_name} ${patient.user.last_name} - ${patient.user.national_id}</span>
+                            <button onclick="deletePatient('${patient.user.national_id}')">Delete</button>
+                        `;
+                        patientList.appendChild(patientItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('Failed to fetch patients:', error);
+                });
+        }
+
+        function deletePatient(nationalId) {
+            console.log('Delete patient with national ID:', nationalId);
+            // Here you would call your API to delete the patient and then refresh the list
+            // For now, just show a log message
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchPatients(); // Load patients when the page loads
+        });
+    </script>
+</body>
+</html>
