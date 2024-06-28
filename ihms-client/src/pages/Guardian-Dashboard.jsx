@@ -5,10 +5,13 @@ import axios from "axios";
 import { getCookie } from '../lib/csrf';
 import { fetchWithAuth } from '../lib/authfetch';
 import Logout from '../lib/logout';
+import { useNavigate } from 'react-router-dom';
+
 
 axios.defaults.withCredentials = true;
 
 const GuardianDashboard = () => {
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState({ phone_number: false, charity_org_name: false, address: false });
   const [user, setUser] = useState({
     user: {
@@ -151,7 +154,7 @@ const GuardianDashboard = () => {
           <h1 id="dashboard">داشبورد سرپرست</h1>
         </div>
         <div className="profile-section">
-          <h2>پروفایل {user["user"]["gender"] === 'M' ? "آقای": "خانوم"} {user["user"] != undefined ? user["user"]["first_name"] + " " 
+          <h2>پروفایل {user["user"] != undefined ? (user["user"]["gender"] === 'M' ? "آقای": "خانوم") : ""} {user["user"] != undefined ? user["user"]["first_name"] + " " 
           + user["user"]["last_name"]: "رئیس"}</h2>
           <div className="profile-details">
             <div className="profile-info">

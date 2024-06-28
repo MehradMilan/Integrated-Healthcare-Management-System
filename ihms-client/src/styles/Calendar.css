@@ -1,11 +1,15 @@
   
   .calendar-container {
-    width: 90%;
+    font-family: 'Arial', sans-serif;
+    width: 100%;
     max-width: 1200px;
     background-color: white;
     border: 1px solid #ddd;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     padding: 10px;
+    direction: ltr;
+    justify-content: center;
+    align-items: center;
   }
   
   .week-header {
@@ -23,6 +27,7 @@
     font-size: 1.5em;
     cursor: pointer;
     padding: 0 50px;
+    color: #45a049;
   }
   
   .calendar {

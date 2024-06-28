@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../styles//Calendar.css';
 import { getCookie } from '../lib/csrf';
+import { fetchWithAuth } from '../lib/authfetch';
 
 const Calendar = () => {
   const [weekOffset, setWeekOffset] = useState(0);
@@ -43,13 +44,13 @@ const Calendar = () => {
 
     calendar.innerHTML = `
         <div class="header header-time"></div>
-        <div class="header">Sunday</div>
-        <div class="header">Monday</div>
-        <div class="header">Tuesday</div>
-        <div class="header">Wednesday</div>
-        <div class="header">Thursday</div>
-        <div class="header">Friday</div>
-        <div class="header">Saturday</div>
+        <div class="header">یک‌‌شنیه</div>
+        <div class="header">دوشنیه</div>
+        <div class="header">سه‌شنبه</div>
+        <div class="header">چهارشنبه</div>
+        <div class="header">پنجشنبه</div>
+        <div class="header">جمعه</div>
+        <div class="header">شنبه</div>
     `;
 
     for (let hour = 0; hour < 24; hour++) {
@@ -69,7 +70,7 @@ const Calendar = () => {
   };
 
   const fetchSchedule = (startOfWeek, endOfWeek) => {
-    fetch('/api/get_doctors_schedule/', {
+    fetchWithAuth(import.meta.env.VITE_SERVER_DOMAIN + '/get_doctors_schedule/', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -136,7 +137,7 @@ const Calendar = () => {
   };
 
   const handleDelete = (scheduleId) => {
-    fetch('/api/delete_doctor_time/', {
+    fetchWithAuth(import.meta.env.VITE_SERVER_DOMAIN + '/delete_doctor_time/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -158,7 +159,7 @@ const Calendar = () => {
 
   const handleVolunteer = (cellDate) => {
     const timeString = formatDateTime(cellDate);
-    fetch('/api/add_doctor_time/', {
+    fetchWithAuth(import.meta.env.VITE_SERVER_DOMAIN + '/add_doctor_time/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
