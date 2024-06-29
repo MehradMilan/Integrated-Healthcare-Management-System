@@ -144,7 +144,6 @@ function Login() {
       </section>
       <footer className="footer">
         <p>تمامی حقوق محفوظ است © 2024</p>
-        <p>جانم فدای دکتر نظریانی</p>
       </footer>
     </div>
   );

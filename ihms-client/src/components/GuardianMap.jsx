@@ -7,54 +7,25 @@ import { fetchWithAuth } from '../lib/authfetch';
 const GuardianMap = () => {
   const [guardianCoordinates, setGuardianCoordinates] = useState({ latitude: 32.4279, longitude: 53.6880 });
   const [doctorCoordinates, setDoctorCoordinates] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  const updateGuardianCoordinates = (position) => {
-    setGuardianCoordinates({
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude
-    });
-    setLoading(false);
-  };
+//   useEffect(() => {
+//     // Fetch and place the base marker
+//     fetchWithAuth(import.meta.env.VITE_SERVER_DOMAIN + '/get_guardian_coordinates/')
+//       .then(response => {
+//         setGuardianCoordinates(response.data);
+//       })
+//       .catch(console.error);
 
-  const fetchLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          updateGuardianCoordinates(position);
-        },
-        (error) => {
-          console.error('Error getting guardian coordinates:', error);
-          setLoading(false); // Set loading to false even if there is an error
-        }
-      );
-    } else {
-      setLoading(false); // Set loading to false if geolocation is not supported
-    }
-  };
-
-  useEffect(() => {
-    // Fetch guardian's initial coordinates
-    fetchLocation();
-
-    // Fetch and place doctor markers
-    fetchWithAuth(import.meta.env.VITE_SERVER_DOMAIN + '/get_doctors_coordinates/')
-      .then(response => {
-        setDoctorCoordinates(response.data);
-        setLoading(false); // Set loading to false after data is fetched
-      })
-      .catch(error => {
-        console.error('Error fetching doctor coordinates:', error);
-        setLoading(false); // Set loading to false in case of an error
-      });
-  }, []);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+//     // Fetch and place doctor markers
+//     fetchWithAuth(import.meta.env.VITE_SERVER_DOMAIN + '/get_doctors_coordinates/')
+//       .then(response => {
+//         setDoctorCoordinates(response.data);
+//       })
+//       .catch(console.error);
+//   }, []);
 
   return (
-    <MapContainer center={[guardianCoordinates.latitude, guardianCoordinates.longitude]} zoom={5.5} style={{ height: "500px", width: "100%" }}>
+    <MapContainer center={[32.4279, 53.6880]} zoom={5.5} style={{ height: "500px", width: "100%" }}>
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution="&copy; OpenStreetMap contributors"

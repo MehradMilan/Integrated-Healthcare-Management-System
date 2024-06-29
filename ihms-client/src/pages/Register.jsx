@@ -6,6 +6,7 @@ import toast, { Toaster } from "react-hot-toast";
 import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
+import { getCookie } from "../lib/csrf";
 
 axios.defaults.baseURL = import.meta.env.VITE_SERVER_DOMAIN;
 
@@ -123,13 +124,16 @@ function Register() {
       console.log(userData);
       var urlType = userType === "doctor" ? "/doctors/" : "/guardians/";
       await toast.promise(
-        axios.post(urlType, userData),
+        axios.post(urlType, userData, {
+            headers: {
+              'X-CSRFToken': getCookie('csrftoken'),
+            }})
+          ,
         {
           pending: "در حال ایجاد حساب کاربری...",
           success: "حساب کاربری با موفقیت ایجاد شد و پس از بررسی کارشناسان ما، تایید یا رد خواهد شد.",
           error: "خطا در ایجاد حساب کاربری",
-        }
-      );
+        })
       navigate("/login");
     } catch (error) {
       console.log(error)
